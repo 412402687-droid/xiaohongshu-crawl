@@ -1,0 +1,32 @@
+{
+  "brands": [
+    { "name": "花西子", "industry": "美妆", "style": "国风彩妆、东方美学" },
+    { "name": "完美日记", "industry": "美妆", "style": "新锐彩妆、年轻潮流" },
+    { "name": "橘朵", "industry": "美妆", "style": "平价彩妆、少女甜酷" },
+    { "name": "彩棠", "industry": "美妆", "style": "专业彩妆、中式骨相" },
+    { "name": "毛戈平", "industry": "美妆", "style": "高端彩妆、大师光影" },
+    { "name": "优衣库", "industry": "时尚", "style": "基础穿搭、日系极简" },
+    { "name": "ZARA", "industry": "时尚", "style": "快时尚、欧美潮流" },
+    { "name": "蕉内", "industry": "时尚", "style": "内衣家居、科技面料" },
+    { "name": "太平鸟", "industry": "时尚", "style": "国潮时尚、年轻通勤" },
+    { "name": "MLBK", "industry": "时尚", "style": "运动时尚、街头潮流" },
+    { "name": "蔻驰", "industry": "包具", "style": "轻奢包袋、美式经典" },
+    { "name": "小CK", "industry": "包具", "style": "快时尚包袋、平价精致" },
+    { "name": "古良吉吉", "industry": "包具", "style": "原创设计、复古文艺" },
+    { "name": "崧SONG", "industry": "包具", "style": "原创包袋、东方极简" },
+    { "name": "雅诗兰黛", "industry": "护肤", "style": "高端护肤、科技抗老" },
+    { "name": "珀莱雅", "industry": "护肤", "style": "功效护肤、早C晚A" },
+    { "name": "薇诺娜", "industry": "护肤", "style": "敏感肌护肤、医学背景" },
+    { "name": "瑷尔博士", "industry": "护肤", "style": "微生态护肤、科学修护" },
+    { "name": "可复美", "industry": "护肤", "style": "医美护肤、胶原蛋白" },
+    { "name": "LV", "industry": "奢侈品", "style": "顶级奢侈、旅行精神" },
+    { "name": "香奈儿", "industry": "奢侈品", "style": "顶级奢侈、法式优雅" },
+    { "name": "迪奥", "industry": "奢侈品", "style": "顶级奢侈、华丽浪漫" },
+    { "name": "古驰", "industry": "奢侈品", "style": "顶级奢侈、复古华丽" },
+    { "name": "喜茶", "industry": "茶饮", "style": "新式茶饮、灵感之茶" },
+    { "name": "霸王茶姬", "industry": "茶饮", "style": "国风茶饮、原叶鲜奶茶" },
+    { "name": "茉莉奶白", "industry": "茶饮", "style": "花香茶饮、茉莉鲜奶" },
+    { "name": "观夏", "industry": "香水", "style": "东方植物香、东方美学" },
+    { "name": "闻献", "industry": "香水", "style": "国产高端香氛、禅酷美学" }
+  ]
+}
