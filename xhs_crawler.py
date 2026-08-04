@@ -1,38 +1,34 @@
 """
-小红书搜索抓取模块 — 基于 Playwright
+小红书搜索抓取模块 — 基于 Playwright (增强版)
 
-功能：
-- 搜索指定品牌关键词
-- 提取笔记标题、链接、点赞数、收藏数、评论数、发布时间
-- 支持 Cookie 登录态（绕过验证码）
+改进点:
+- 启动时先访问首页建立会话，再加载 Cookie
+- 添加 WebDriver 隐藏参数绕过检测
+- 等待搜索结果容器出现后再提取
+- 单步操作加 try/except，单页失败不影响其他品牌
 """
 
 import asyncio
 import json
 import os
 import re
-import time
 import sys
-from datetime import datetime
 from typing import Optional
 
-# 将项目根目录加入 path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
     from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeout
 except ImportError:
-    # 降级处理，仅用于模块导入场景
     async_playwright = None
 
 # ── 常量 ──────────────────────────────────────────────
 SEARCH_URL = "https://www.xiaohongshu.com/search_result"
 LOGIN_URL = "https://www.xiaohongshu.com"
-DEFAULT_TIMEOUT = 15000       # ms
-SEARCH_TIMEOUT = 20000        # ms
-SCROLL_PAUSE = 2.0            # 每次滚动间隔（秒）
-MAX_SCROLL = 8                # 最大滚动次数
-MIN_POSTS = 15                # 最少采集笔记数
+DEFAULT_TIMEOUT = 20000       # ms
+SEARCH_TIMEOUT = 25000        # ms
+SCROLL_PAUSE = 2.5            # 每次滚动间隔（秒）
+MAX_SCROLL = 6                # 最大滚动次数
 
 
 def load_cookies_from_env() -> Optional[list]:
@@ -74,115 +70,189 @@ def parse_count(text: Optional[str]) -> int:
         return 0
 
 
+async def safe_query_all(page, selectors: list, timeout: int = 5000) -> list:
+    """尝试多个选择器，返回第一个匹配的元素列表。"""
+    for selector in selectors:
+        try:
+            els = await page.query_selector_all(selector)
+            if els:
+                return els
+        except Exception:
+            continue
+        await asyncio.sleep(0.3)
+    return []
+
+
 async def crawl_brand(brand_name: str, max_posts: int = 20) -> list:
     """
     搜索指定品牌并返回笔记列表。
-
-    返回格式:
-    [
-        {
-            "title": "...",
-            "url": "...",
-            "likes": 1234,
-            "collects": 567,
-            "comments": 89,
-            "publish_time": "2026-08-05",
-            "author": "...",
-            "note_type": "图文|视频",
-        },
-        ...
-    ]
     """
     if async_playwright is None:
-        raise RuntimeError("playwright 未安装，请执行: pip install playwright && playwright install")
+        raise RuntimeError("playwright 未安装")
 
     results = []
     cookie_data = load_cookies_from_env()
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-infobars",
+            ],
+        )
         context = await browser.new_context(
-            viewport={"width": 1280, "height": 800},
+            viewport={"width": 1440, "height": 900},
             user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
+            locale="zh-CN",
+            timezone_id="Asia/Shanghai",
         )
+
+        # 注入反检测脚本
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.chrome = { runtime: {} };
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) =>
+                parameters.name === 'notifications'
+                    ? Promise.resolve({ state: Notification.permission })
+                    : originalQuery(parameters);
+        """)
 
         if cookie_data:
             await context.add_cookies(cookie_data)
 
         page = await context.new_page()
+        page.set_default_timeout(DEFAULT_TIMEOUT)
 
         try:
-            # 先访问首页建立会话
-            await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=DEFAULT_TIMEOUT)
-            await asyncio.sleep(1)
-
-            # 构造搜索 URL
-            keyword = brand_name
-            search_url = f"{SEARCH_URL}?keyword={keyword}&sort=general"
-            await page.goto(search_url, wait_until="domcontentloaded", timeout=SEARCH_TIMEOUT)
+            # 第一步：访问首页建立会话（带 cookie）
+            print(f"  [{brand_name}] 访问首页建立会话...")
+            try:
+                await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=DEFAULT_TIMEOUT)
+            except Exception as exc:
+                print(f"  [{brand_name}] 首页访问异常(继续): {exc}")
             await asyncio.sleep(2)
 
-            # 滚动加载更多
+            # 第二步：构造搜索 URL 并访问
+            keyword_encoded = brand_name
+            search_url = f"{SEARCH_URL}?keyword={keyword_encoded}&source=web_explore_feed&sort=general"
+            print(f"  [{brand_name}] 访问搜索页: {search_url}")
+
+            try:
+                await page.goto(search_url, wait_until="domcontentloaded", timeout=SEARCH_TIMEOUT)
+            except PlaywrightTimeout:
+                print(f"  [{brand_name}] 搜索页加载超时")
+                return results
+            except Exception as exc:
+                print(f"  [{brand_name}] 搜索页访问异常: {exc}")
+                return results
+
+            await asyncio.sleep(3)
+
+            # 第三步：滚动加载 + 提取
             scroll_count = 0
+            seen_urls = set()
+            selectors = [
+                "section.note-item",
+                "div.note-item",
+                "a[href*='/explore/']",
+                "a[href*='/search-result/']",
+                "div[data-v]",
+            ]
+
             while len(results) < max_posts and scroll_count < MAX_SCROLL:
-                # 提取当前可见笔记
-                cards = await page.query_selector_all("section.note-item, div.note-item, a[href*='/explore/']")
+                # 安全查询元素（多选择器回退 + 容错）
+                cards = await safe_query_all(page, selectors, timeout=4000)
+
                 if not cards:
-                    # 备选选择器
-                    cards = await page.query_selector_all("div[class*='note'] a[href*='/explore/']")
+                    print(f"  [{brand_name}] 第 {scroll_count+1} 轮: 未找到元素")
+                else:
+                    print(f"  [{brand_name}] 第 {scroll_count+1} 轮: 找到 {len(cards)} 个候选元素")
 
                 for card in cards:
                     try:
                         href = await card.get_attribute("href")
                         if not href:
                             continue
-                        # 去重
-                        if any(r.get("url") == href for r in results):
+                        # 拼接完整 URL
+                        full_url = (
+                            f"https://www.xiaohongshu.com{href}"
+                            if href.startswith("/")
+                            else href
+                        )
+                        if full_url in seen_urls:
+                            continue
+                        seen_urls.add(full_url)
+
+                        # 标题
+                        title = ""
+                        for ts in ["span.title", ".title", "[class*='title']", "[class*='Title']"]:
+                            try:
+                                te = await card.query_selector(ts)
+                                if te:
+                                    title = await te.inner_text()
+                                    if title.strip():
+                                        break
+                            except Exception:
+                                continue
+
+                        # 作者
+                        author = ""
+                        for as_ in [".author .name", ".nickname", "[class*='author'] [class*='name']"]:
+                            try:
+                                ae = await card.query_selector(as_)
+                                if ae:
+                                    author = await ae.inner_text()
+                                    if author.strip():
+                                        break
+                            except Exception:
+                                continue
+
+                        # 笔记类型
+                        is_video = False
+                        try:
+                            is_video = bool(await card.query_selector("[class*='video'], .play-icon, svg[class*='play']"))
+                        except Exception:
+                            pass
+
+                        if not title and not author:
                             continue
 
-                        title_el = await card.query_selector(
-                            "span.title, .title, [class*='title']"
-                        )
-                        title = await title_el.inner_text() if title_el else ""
-
-                        author_el = await card.query_selector(
-                            ".author .name, [class*='author'] [class*='name'], .nickname"
-                        )
-                        author = await author_el.inner_text() if author_el else ""
-
-                        # 笔记类型判断
-                        is_video = await card.query_selector("[class*='video'], .play-icon")
-                        note_type = "视频" if is_video else "图文"
-
                         results.append({
-                            "title": title.strip() if title else "",
-                            "url": f"https://www.xiaohongshu.com{href}" if href.startswith("/") else href,
+                            "title": title.strip(),
+                            "url": full_url,
                             "likes": 0,
                             "collects": 0,
                             "comments": 0,
                             "publish_time": "",
-                            "author": author.strip() if author else "",
-                            "note_type": note_type,
+                            "author": author.strip(),
+                            "note_type": "视频" if is_video else "图文",
                         })
+
+                        if len(results) >= max_posts:
+                            break
                     except Exception:
                         continue
 
-                # 滚动
-                await page.evaluate("window.scrollBy(0, window.innerHeight)")
+                # 滚动加载
+                try:
+                    await page.evaluate("window.scrollBy(0, window.innerHeight * 0.8)")
+                except Exception:
+                    break
                 scroll_count += 1
                 await asyncio.sleep(SCROLL_PAUSE)
 
-            # 截断到 max_posts
             results = results[:max_posts]
 
-        except PlaywrightTimeout:
-            print(f"[{brand_name}] 页面加载超时，已获取 {len(results)} 条")
         except Exception as exc:
-            print(f"[{brand_name}] 抓取出错: {exc}")
+            print(f"  [{brand_name}] 抓取过程异常: {exc}")
         finally:
             await browser.close()
 
@@ -192,13 +262,6 @@ async def crawl_brand(brand_name: str, max_posts: int = 20) -> list:
 async def crawl_all_brands(brands: list, max_per_brand: int = 20) -> dict:
     """
     批量抓取多个品牌。
-
-    参数:
-        brands: 品牌配置列表，每项含 name 字段
-        max_per_brand: 每个品牌最多抓取笔记数
-
-    返回:
-        { "花西子": [...], "雅诗兰黛": [...], ... }
     """
     all_results = {}
     for brand in brands:
@@ -214,7 +277,7 @@ async def crawl_all_brands(brands: list, max_per_brand: int = 20) -> dict:
             print(f"[{name}] 抓取失败: {exc}")
             all_results[name] = []
         # 品牌间间隔，避免限流
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
     return all_results
 
 
