@@ -2,9 +2,11 @@
 每日抓取主程序 — daily_crawl.py
 
 流程:
-1. 读取 brand_config.json 品牌配置
-2. 对每个品牌调用 xhs_crawler 搜索抓取
-3. 将结果写入飞书多维表格
+1. 启动 VPN（本地桌面环境自动开启 Sakurucat）
+2. 读取 brand_config.json 品牌配置
+3. 对每个品牌调用 xhs_crawler 搜索抓取
+4. 将结果写入飞书多维表格
+5. 关闭 VPN
 
 运行方式:
     python3 feishu/daily_crawl.py
@@ -31,6 +33,7 @@ from feishu.bitable import (
     write_brand_data,
 )
 from xhs_crawler import crawl_all_brands
+from utils.vpn import start_vpn, stop_vpn
 
 
 def load_brand_config() -> list:
@@ -56,6 +59,12 @@ async def run_daily_crawl():
     print(f"=" * 50)
     print(f"小红书每日抓取开始: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"=" * 50)
+
+    # 0. 启动 VPN（本地桌面环境，GitHub Actions 自动跳过）
+    print(f"\n[VPN] 准备启动 Sakurucat...")
+    vpn_ok = start_vpn()
+    if not vpn_ok:
+        print("警告: VPN 启动失败，继续尝试抓取...")
 
     # 1. 加载品牌配置
     brands = load_brand_config()
@@ -101,7 +110,11 @@ async def run_daily_crawl():
         print(f"[飞书] 写入失败: {exc}")
         written = 0
 
-    # 5. 汇总
+    # 5. 关闭 VPN
+    print(f"\n[VPN] 抓取完成，关闭 Sakurucat...")
+    stop_vpn()
+
+    # 6. 汇总
     elapsed = (datetime.now() - start_time).total_seconds()
     print(f"\n{'=' * 50}")
     print(f"抓取完成!")

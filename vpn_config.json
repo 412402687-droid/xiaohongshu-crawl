@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "executable": "sakurucat.exe",
+  "process_name": "sakurucat",
+  "startup_wait": 5,
+  "shutdown_wait": 2
+}
