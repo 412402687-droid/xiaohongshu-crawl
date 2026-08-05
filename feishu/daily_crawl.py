@@ -96,7 +96,7 @@ async def run_daily_crawl():
     # 3. 按品牌抓取
     print(f"\n[抓取] === 按品牌搜索（{len(brands)} 个）===")
     try:
-        brand_results = await crawl_all_sources(brands, max_per_source=8)
+        brand_results = await crawl_all_sources(brands, max_per_source=5)
         brand_total = sum(len(v) for v in brand_results.values())
         print(f"[品牌抓取] 完成: {len(brands)} 个品牌，共 {brand_total} 条结果")
     except Exception as exc:
@@ -106,7 +106,7 @@ async def run_daily_crawl():
     # 4. 按热点关键词抓取
     print(f"\n[抓取] === 按行业热点搜索（{len(topic_keywords)} 个）===")
     try:
-        topic_results = await crawl_topic_keywords(topic_keywords, max_results=8)
+        topic_results = await crawl_topic_keywords(topic_keywords, max_results=5)
         print(f"[热点抓取] 完成: {len(topic_results)} 条结果")
     except Exception as exc:
         print(f"[热点抓取] 出错: {exc}")

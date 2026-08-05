@@ -1,5 +1,5 @@
 """
-CBNData 爬虫 — 通过首页搜索框交互
+CBNData 爬虫 — 简化为直接访问 + 短超时
 """
 
 from crawlers.base import BaseCrawler
@@ -8,47 +8,16 @@ from crawlers.base import BaseCrawler
 class CBNDataCrawler(BaseCrawler):
     def __init__(self):
         super().__init__("CBNData", "https://www.cbndata.com")
-        self.rate_limit = 4.0
+        self.rate_limit = 2.0
 
     async def search(self, page, keyword: str, max_results: int = 10) -> list:
         results = []
         try:
-            # 进入首页
-            await page.goto("https://www.cbndata.com", wait_until="domcontentloaded", timeout=20000)
-            await page.wait_for_timeout(2000)
+            page.set_default_timeout(15000)
+            await page.goto(f"https://www.cbndata.com/search?query={keyword}",
+                            wait_until="domcontentloaded", timeout=15000)
+            await page.wait_for_timeout(2500)
 
-            # 找搜索框
-            search_selectors = [
-                'input[type="search"]',
-                'input[name*="search"]',
-                'input[placeholder*="搜索"]',
-                'input[placeholder*="搜"]',
-                '.search-input',
-                '#search-input',
-            ]
-
-            search_input = None
-            for sel in search_selectors:
-                try:
-                    el = await page.query_selector(sel)
-                    if el:
-                        search_input = el
-                        break
-                except Exception:
-                    continue
-
-            if search_input:
-                await search_input.fill(keyword)
-                await search_input.press("Enter")
-                await page.wait_for_timeout(4000)
-            else:
-                # 没找到搜索框，直接访问URL
-                await page.goto(f"https://www.cbndata.com/search?query={keyword}",
-                                wait_until="domcontentloaded", timeout=20000)
-                await page.wait_for_timeout(3000)
-
-            # 提取文章链接
-            await page.wait_for_timeout(2000)
             cards = await page.query_selector_all("a[href*='/information/'], a[href*='/report/']")
             seen = set()
             for card in cards[:max_results * 3]:
@@ -77,7 +46,7 @@ class CBNDataCrawler(BaseCrawler):
                 except Exception:
                     continue
         except Exception as exc:
-            print(f"  [{self.name}] {keyword}: 异常 {exc}")
+            print(f"  [{self.name}] {keyword}: 超时/异常（已跳过）")
 
         print(f"  [{self.name}] {keyword}: 获取 {len(results)} 条")
         return results

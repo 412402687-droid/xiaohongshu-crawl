@@ -17,7 +17,7 @@ from crawlers.djyanbao import DJYanbaoCrawler
 from crawlers.fxbaogao import FxBaoGaoCrawler
 
 
-async def crawl_all_sources(brands: list, max_per_source: int = 10) -> dict:
+async def crawl_all_sources(brands: list, max_per_source: int = 5) -> dict:
     """
     使用 Playwright 抓取各平台品牌数据。
     """
