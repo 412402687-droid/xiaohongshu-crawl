@@ -184,6 +184,66 @@ def write_brand_data(
     return written
 
 
+# ── 多源情报写入 ──────────────────────────────────────
+
+def build_article_fields(article: dict) -> dict:
+    """
+    将多源情报文章转换为飞书多维表格字段。
+
+    字段映射到现有表格的通用字段。
+    """
+    now = time.strftime("%Y-%m-%d %H:%M:%S")
+    return {
+        "品牌名称": article.get("keyword", ""),
+        "笔记标题": article.get("title", ""),
+        "笔记链接": {
+            "link": article.get("url", ""),
+            "text": article.get("title", "") or "查看原文",
+        },
+        "笔记类型": article.get("source", ""),
+        "作者": article.get("category", ""),
+        "发布时间": article.get("date", ""),
+        "抓取时间": now,
+        "抓取日期": now[:10],
+    }
+
+
+def write_multi_source_data(
+    articles: list,
+    app_token: str,
+    table_id: str,
+    token: str,
+) -> int:
+    """
+    将多源情报数据写入飞书多维表格。
+
+    Args:
+        articles: 来自各平台的文章列表
+        app_token / table_id / token: 飞书配置
+
+    Returns:
+        成功写入的记录数
+    """
+    if not articles:
+        print("没有需要写入的情报")
+        return 0
+
+    # 去重（按 URL）
+    seen = set()
+    unique = []
+    for a in articles:
+        url = a.get("url", "")
+        if url and url not in seen:
+            seen.add(url)
+            unique.append(a)
+        elif not url:
+            unique.append(a)
+
+    records = [build_article_fields(a) for a in unique]
+    print(f"去重后 {len(records)} 条（原始 {len(articles)} 条）")
+    return batch_create_records(app_token, table_id, records, token)
+
+
 # ── 命令行测试 ────────────────────────────────────────
 if __name__ == "__main__":
     cfg = load_feishu_config()
