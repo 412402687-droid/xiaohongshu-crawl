@@ -1,5 +1,5 @@
 """
-CBNData 爬虫 — 第一财经商业数据中心（Playwright 版）
+CBNData 爬虫 — 通过首页搜索框交互
 """
 
 from crawlers.base import BaseCrawler
@@ -8,27 +8,47 @@ from crawlers.base import BaseCrawler
 class CBNDataCrawler(BaseCrawler):
     def __init__(self):
         super().__init__("CBNData", "https://www.cbndata.com")
-        self.rate_limit = 3.0
+        self.rate_limit = 4.0
 
     async def search(self, page, keyword: str, max_results: int = 10) -> list:
         results = []
         try:
             # 进入首页
             await page.goto("https://www.cbndata.com", wait_until="domcontentloaded", timeout=20000)
-            await page.wait_for_timeout(1500)
+            await page.wait_for_timeout(2000)
 
-            # 在 URL 上拼搜索关键词（更可靠）
-            search_url = f"https://www.cbndata.com/search?query={keyword}"
-            await page.goto(search_url, wait_until="domcontentloaded", timeout=20000)
-            await page.wait_for_timeout(3000)
+            # 找搜索框
+            search_selectors = [
+                'input[type="search"]',
+                'input[name*="search"]',
+                'input[placeholder*="搜索"]',
+                'input[placeholder*="搜"]',
+                '.search-input',
+                '#search-input',
+            ]
 
-            # 等待搜索结果出现
-            try:
-                await page.wait_for_selector(".information-card, .report-card, .search-item", timeout=10000)
-            except Exception:
-                pass
+            search_input = None
+            for sel in search_selectors:
+                try:
+                    el = await page.query_selector(sel)
+                    if el:
+                        search_input = el
+                        break
+                except Exception:
+                    continue
 
-            # 提取
+            if search_input:
+                await search_input.fill(keyword)
+                await search_input.press("Enter")
+                await page.wait_for_timeout(4000)
+            else:
+                # 没找到搜索框，直接访问URL
+                await page.goto(f"https://www.cbndata.com/search?query={keyword}",
+                                wait_until="domcontentloaded", timeout=20000)
+                await page.wait_for_timeout(3000)
+
+            # 提取文章链接
+            await page.wait_for_timeout(2000)
             cards = await page.query_selector_all("a[href*='/information/'], a[href*='/report/']")
             seen = set()
             for card in cards[:max_results * 3]:
@@ -37,15 +57,11 @@ class CBNDataCrawler(BaseCrawler):
                     if not href or href in seen:
                         continue
                     seen.add(href)
-
                     text = (await card.inner_text()).strip()
-                    if not text or len(text) < 5:
+                    if not text or len(text) < 4:
                         continue
-
-                    # 第一行作为标题
                     title = text.split("\n")[0].strip()
                     full_url = href if href.startswith("http") else f"https://www.cbndata.com{href}"
-
                     results.append({
                         "source": self.name,
                         "keyword": keyword,
