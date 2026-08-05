@@ -1,42 +1,33 @@
 """
-基础爬虫模块 — 提供统一的抓取接口和通用工具
+基础爬虫模块 — Playwright 通用版
 
-所有平台爬虫继承 BaseCrawler，只需实现 search() 方法。
+所有平台爬虫继承 BaseCrawler，使用 Playwright 渲染 JavaScript 页面。
 """
 
 import asyncio
 import re
-import time
 from abc import ABC, abstractmethod
-from datetime import datetime
 
 
 class BaseCrawler(ABC):
-    """爬虫基类，定义统一接口。"""
+    """爬虫基类，Playwright 异步版。"""
 
     def __init__(self, name: str, base_url: str):
         self.name = name
         self.base_url = base_url
         self.last_request_time = 0
-        self.rate_limit = 2.0  # 请求间隔（秒）
+        self.rate_limit = 3.0  # 请求间隔（秒）
 
     @abstractmethod
-    async def search(self, keyword: str, max_results: int = 10) -> list:
+    async def search(self, page, keyword: str, max_results: int = 10) -> list:
         """
-        搜索指定关键词，返回文章/报告列表。
+        在已加载的 page 上搜索关键词，返回结果列表。
+
+        子类需要实现具体的 URL 跳转、元素选择、提取逻辑。
 
         返回格式:
         [
-            {
-                "source": "CBNData",
-                "keyword": "花西子",
-                "title": "...",
-                "url": "...",
-                "summary": "...",
-                "date": "2026-08-05",
-                "category": "美妆个护",
-                "read_count": 0,
-            },
+            {"source": "...", "keyword": "...", "title": "...", "url": "...", "summary": "...", "date": "..."},
             ...
         ]
         """
@@ -44,6 +35,7 @@ class BaseCrawler(ABC):
 
     async def _rate_limit(self):
         """请求频率控制。"""
+        import time
         elapsed = time.time() - self.last_request_time
         if elapsed < self.rate_limit:
             await asyncio.sleep(self.rate_limit - elapsed)
@@ -51,27 +43,26 @@ class BaseCrawler(ABC):
 
     @staticmethod
     def clean_text(text: str) -> str:
-        """清理文本中的空白和特殊字符。"""
         if not text:
             return ""
         return re.sub(r"\s+", " ", text).strip()
 
     @staticmethod
     def extract_date(text: str) -> str:
-        """从文本中提取日期，返回 YYYY-MM-DD 格式。"""
         if not text:
             return ""
         patterns = [
-            r"(\d{4}-\d{2}-\d{2})",
-            r"(\d{4}/\d{2}/\d{2})",
-            r"(\d{4})年(\d{1,2})月(\d{1,2})日",
-            r"(\d{4})\.(\d{1,2})\.(\d{1,2})",
+            (r"(\d{4})-(\d{1,2})-(\d{1,2})", 3),
+            (r"(\d{4})/(\d{1,2})/(\d{1,2})", 3),
+            (r"(\d{4})\.(\d{1,2})\.(\d{1,2})", 3),
+            (r"(\d{4})年(\d{1,2})月(\d{1,2})日", 3),
         ]
-        for pat in patterns:
-            match = re.search(pat, text)
-            if match:
-                groups = [g.zfill(2) for g in match.groups()]
-                if len(groups) == 3:
-                    return f"{groups[0]}-{groups[1]}-{groups[2]}"
-                return match.group()
+        for pat, n in patterns:
+            m = re.search(pat, text)
+            if m:
+                gs = [g.zfill(2) for g in m.groups()]
+                if len(gs) == 3:
+                    return f"{gs[0]}-{gs[1]}-{gs[2]}"
+        # 兜底：当前日期
+        from datetime import datetime
         return datetime.now().strftime("%Y-%m-%d")

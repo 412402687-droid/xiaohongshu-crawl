@@ -1,111 +1,60 @@
 """
-洞见研报爬虫 — 行业研究报告聚合平台
-
-数据源: https://www.djyanbao.com
-抓取内容: 券商研报、咨询报告、行业分析
-搜索入口: https://www.djyanbao.com/search?keyword={keyword}
+洞见研报爬虫 — Playwright 版
 """
-
-import asyncio
-import re
-import aiohttp
-from bs4 import BeautifulSoup
 
 from crawlers.base import BaseCrawler
 
 
-DJ_SEARCH = "https://www.djyanbao.com/search"
-
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "zh-CN,zh;q=0.9",
-}
-
-
 class DJYanbaoCrawler(BaseCrawler):
-    """洞见研报爬虫"""
-
     def __init__(self):
         super().__init__("洞见研报", "https://www.djyanbao.com")
-        self.rate_limit = 3.0
+        self.rate_limit = 4.0
 
-    async def search(self, keyword: str, max_results: int = 10) -> list:
-        """搜索研报，返回列表。"""
+    async def search(self, page, keyword: str, max_results: int = 10) -> list:
         results = []
-        await self._rate_limit()
-
         try:
-            async with aiohttp.ClientSession() as session:
-                params = {"keyword": keyword}
-                async with session.get(DJ_SEARCH, params=params, headers=HEADERS, timeout=20) as resp:
-                    if resp.status != 200:
-                        print(f"  [洞见研报] {keyword}: HTTP {resp.status}")
-                        return results
-                    html = await resp.text()
+            # 首页
+            await page.goto("https://www.djyanbao.com", wait_until="domcontentloaded", timeout=20000)
+            await page.wait_for_timeout(2000)
 
-            soup = BeautifulSoup(html, "html.parser")
+            # 搜索页（洞见研报是 SPA，URL # 路由）
+            search_url = f"https://www.djyanbao.com/#/search?keyword={keyword}"
+            await page.goto(search_url, wait_until="domcontentloaded", timeout=20000)
+            await page.wait_for_timeout(5000)  # JS 渲染需要更长
 
-            # 报告列表选择器
-            cards = soup.select("div.report-item, div.search-item, div.report-card")
-            if not cards:
-                cards = soup.select("a[href*='/report/'], a[href*='/preview/']")
-
-            # 去重
+            # 提取所有报告链接
+            cards = await page.query_selector_all("a[href*='/preview/'], a[href*='/detail/'], .report-item a")
             seen = set()
-            unique_cards = []
-            for card in cards:
-                href = card.get("href", "")
-                if href in seen:
-                    continue
-                seen.add(href)
-                unique_cards.append(card)
-
-            for card in unique_cards[:max_results]:
+            for card in cards[:max_results * 3]:
                 try:
-                    href = card.get("href", "")
-                    if not href:
+                    href = await card.get_attribute("href")
+                    if not href or href in seen:
+                        continue
+                    seen.add(href)
+
+                    text = (await card.inner_text()).strip()
+                    if not text or len(text) < 5:
                         continue
 
-                    url = href if href.startswith("http") else f"{self.base_url}{href}"
+                    title = text.split("\n")[0].strip()
+                    full_url = href if href.startswith("http") else f"https://www.djyanbao.com{href}"
 
-                    # 标题
-                    title_el = card.find("h3") or card.find(class_=re.compile("title"))
-                    title = self.clean_text(title_el.get_text()) if title_el else ""
-
-                    # 摘要
-                    summary_el = card.find(class_=re.compile("desc|summary|abstract|intro"))
-                    summary = self.clean_text(summary_el.get_text()) if summary_el else ""
-
-                    # 日期
-                    date_el = card.find(class_=re.compile("time|date")) or card.find("time")
-                    date = self.extract_date(date_el.get_text()) if date_el else ""
-
-                    # 机构（券商/咨询公司）
-                    org_el = card.find(class_=re.compile("org|institution|author"))
-                    org = self.clean_text(org_el.get_text()) if org_el else ""
-
-                    if title:
-                        results.append({
-                            "source": self.name,
-                            "keyword": keyword,
-                            "title": title,
-                            "url": url,
-                            "summary": summary,
-                            "date": date or self.extract_date(""),
-                            "category": org,
-                            "read_count": 0,
-                        })
-                except Exception as exc:
-                    print(f"  [洞见研报] 解析卡片出错: {exc}")
+                    results.append({
+                        "source": self.name,
+                        "keyword": keyword,
+                        "title": title[:200],
+                        "url": full_url,
+                        "summary": "",
+                        "date": self.extract_date(text),
+                        "category": "",
+                        "read_count": 0,
+                    })
+                    if len(results) >= max_results:
+                        break
+                except Exception:
                     continue
-
         except Exception as exc:
-            print(f"  [洞见研报] {keyword}: 抓取异常 {exc}")
+            print(f"  [{self.name}] {keyword}: 异常 {exc}")
 
-        print(f"  [洞见研报] {keyword}: 获取 {len(results)} 条")
+        print(f"  [{self.name}] {keyword}: 获取 {len(results)} 条")
         return results
