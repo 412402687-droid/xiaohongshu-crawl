@@ -18,7 +18,7 @@ class CBNDataCrawler(BaseCrawler):
                             wait_until="domcontentloaded", timeout=15000)
             await page.wait_for_timeout(2500)
 
-            cards = await page.query_selector_all("a[href*='/information/'], a[href*='/report/']")
+            cards = await page.query_selector_all("li[data-type='information'] a, li[data-type='report'] a")
             seen = set()
             for card in cards[:max_results * 3]:
                 try:
