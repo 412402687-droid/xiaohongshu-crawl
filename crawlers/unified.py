@@ -7,7 +7,7 @@
     - CBNData: 消费行业报告、品牌分析
     - 艾媒网: 研究报告、品牌排行榜
     - 洞见研报: 券商研报、行业分析
-    - 小红书搜索（已弃用，仅保留占位）
+    - 发现报告: 592万+研报聚合平台
 """
 
 import asyncio
@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crawlers.cbndata import CBNDataCrawler
 from crawlers.iimedia import IIMediaCrawler
 from crawlers.djyanbao import DJYanbaoCrawler
+from crawlers.fxbaogao import FxBaoGaoCrawler
 
 
 async def crawl_all_sources(brands: list, max_per_source: int = 10) -> dict:
@@ -44,6 +45,7 @@ async def crawl_all_sources(brands: list, max_per_source: int = 10) -> dict:
         CBNDataCrawler(),
         IIMediaCrawler(),
         DJYanbaoCrawler(),
+        FxBaoGaoCrawler(),
     ]
 
     for brand in brands:
@@ -80,6 +82,7 @@ async def crawl_topic_keywords(keywords: list, max_results: int = 15) -> list:
         CBNDataCrawler(),
         IIMediaCrawler(),
         DJYanbaoCrawler(),
+        FxBaoGaoCrawler(),
     ]
 
     for kw in keywords:

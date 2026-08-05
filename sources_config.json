@@ -3,7 +3,7 @@
     {
       "name": "CBNData",
       "url": "https://www.cbndata.com",
-      "type": "web",
+      "type": "free",
       "search_url": "https://www.cbndata.com/search?query={keyword}&page={page}",
       "categories": ["美妆个护", "服饰鞋包", "人群研究", "营销趋势", "大健康", "食品饮料"],
       "enabled": true
@@ -11,7 +11,7 @@
     {
       "name": "艾媒网",
       "url": "https://www.iimedia.cn",
-      "type": "web",
+      "type": "free",
       "search_url": "https://www.iimedia.cn/search.html?query={keyword}",
       "channels": {"report": "/c400/", "rank": "/c880/", "data": "/c1061/", "consume": "/c1086/"},
       "enabled": true
@@ -19,14 +19,37 @@
     {
       "name": "洞见研报",
       "url": "https://www.djyanbao.com",
-      "type": "web",
+      "type": "free",
       "search_url": "https://www.djyanbao.com/search?keyword={keyword}",
       "categories": ["大消费", "健康医疗", "科技传媒"],
       "enabled": true
+    },
+    {
+      "name": "发现报告",
+      "url": "https://www.fxbaogao.com",
+      "type": "free",
+      "search_url": "https://www.fxbaogao.com/search?keyword={keyword}",
+      "note": "592万+研报，免费在线阅读",
+      "enabled": true
+    },
+    {
+      "name": "千瓜数据",
+      "url": "https://www.qian-gua.com",
+      "type": "login_required",
+      "note": "小红书专业数据平台，需付费账号登录，待后续配置",
+      "enabled": false
+    },
+    {
+      "name": "新红数据",
+      "url": "https://xh.newrank.cn",
+      "type": "login_required",
+      "note": "新榜旗下小红书分析工具，需账号，待后续配置",
+      "enabled": false
     }
   ],
   "brand_keywords": [
     "新消费", "美妆", "护肤", "国货", "品牌营销",
-    "新锐品牌", "消费趋势", "Z世代", "女性消费"
+    "新锐品牌", "消费趋势", "Z世代", "女性消费",
+    "情绪消费", "东方美学", "中国品牌", "消费升级"
   ]
 }
