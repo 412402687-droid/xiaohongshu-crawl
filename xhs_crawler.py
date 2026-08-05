@@ -156,6 +156,32 @@ async def crawl_brand(brand_name: str, max_posts: int = 20) -> list:
 
             await asyncio.sleep(3)
 
+            # 调试：检测当前页面状态
+            try:
+                page_url = page.url
+                page_title = await page.title()
+                print(f"  [{brand_name}] 当前 URL: {page_url}")
+                print(f"  [{brand_name}] 页面标题: {page_title}")
+            except Exception:
+                pass
+
+            # 检测是否被拦截（登录墙/验证码/反爬）
+            try:
+                body_text = await page.evaluate("document.body.innerText")
+                if any(kw in body_text for kw in ["登录", "请先登录", "未登录", "请验证", "验证码", "访问频次"]):
+                    print(f"  [{brand_name}] ⚠ 检测到登录/验证墙，Cookie 可能失效")
+                    return results
+            except Exception:
+                pass
+
+            # 调试：截图第一轮前
+            debug_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "debug_screenshots")
+            try:
+                os.makedirs(debug_dir, exist_ok=True)
+                await page.screenshot(path=os.path.join(debug_dir, f"{brand_name}_initial.png"), full_page=False)
+            except Exception:
+                pass
+
             # 第三步：滚动加载 + 提取
             scroll_count = 0
             seen_urls = set()
@@ -165,6 +191,12 @@ async def crawl_brand(brand_name: str, max_posts: int = 20) -> list:
                 "a[href*='/explore/']",
                 "a[href*='/search-result/']",
                 "div[data-v]",
+                "[data-v-]",
+                ".feeds-page .note-item",
+                ".search-result-card",
+                "[class*='note-card']",
+                "[class*='NoteCard']",
+                "[class*='search'] [class*='card']",
             ]
 
             while len(results) < max_posts and scroll_count < MAX_SCROLL:
@@ -172,7 +204,16 @@ async def crawl_brand(brand_name: str, max_posts: int = 20) -> list:
                 cards = await safe_query_all(page, selectors, timeout=4000)
 
                 if not cards:
-                    print(f"  [{brand_name}] 第 {scroll_count+1} 轮: 未找到元素")
+                    if scroll_count == 0:
+                        print(f"  [{brand_name}] 第 1 轮: 未找到元素，截图已保存到 debug_screenshots/{brand_name}_initial.png")
+                        # 抓取页面 HTML 头部用作排查
+                        try:
+                            html_snippet = await page.evaluate("document.body.outerHTML.substring(0, 500)")
+                            print(f"  [{brand_name}] 页面 HTML 头部: {html_snippet[:300]}")
+                        except Exception:
+                            pass
+                    else:
+                        print(f"  [{brand_name}] 第 {scroll_count+1} 轮: 未找到元素")
                 else:
                     print(f"  [{brand_name}] 第 {scroll_count+1} 轮: 找到 {len(cards)} 个候选元素")
 
