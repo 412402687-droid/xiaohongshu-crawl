@@ -14,7 +14,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crawlers.cbndata import CBNDataCrawler
 from crawlers.iimedia import IIMediaCrawler
 from crawlers.djyanbao import DJYanbaoCrawler
-from crawlers.fxbaogao import FxBaoGaoCrawler
 
 
 async def crawl_all_sources(brands: list, max_per_source: int = 5) -> dict:
@@ -28,7 +27,6 @@ async def crawl_all_sources(brands: list, max_per_source: int = 5) -> dict:
         CBNDataCrawler(),
         IIMediaCrawler(),
         DJYanbaoCrawler(),
-        FxBaoGaoCrawler(),
     ]
 
     async with async_playwright() as p:
@@ -94,7 +92,6 @@ async def crawl_topic_keywords(keywords: list, max_results: int = 15) -> list:
         CBNDataCrawler(),
         IIMediaCrawler(),
         DJYanbaoCrawler(),
-        FxBaoGaoCrawler(),
     ]
 
     async with async_playwright() as p:

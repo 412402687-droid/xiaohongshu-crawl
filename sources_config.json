@@ -25,14 +25,6 @@
       "enabled": true
     },
     {
-      "name": "发现报告",
-      "url": "https://www.fxbaogao.com",
-      "type": "free",
-      "search_url": "https://www.fxbaogao.com/search?keyword={keyword}",
-      "note": "592万+研报，免费在线阅读",
-      "enabled": true
-    },
-    {
       "name": "千瓜数据",
       "url": "https://www.qian-gua.com",
       "type": "login_required",
