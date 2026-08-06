@@ -43,6 +43,7 @@
     { "name": "BYREDO", "industry": "香水", "style": "瑞典极简沙龙香、北欧美学" },
     { "name": "Diptyque", "industry": "香水", "style": "法式艺术香氛、香薰蜡烛" },
     { "name": "Jo Malone", "industry": "香水", "style": "英伦香氛、叠香艺术" },
+    { "name": "馥郁满铺", "industry": "香水", "style": "中式文人香氛、东方叙事" },
     { "name": "伊索 Aesop", "industry": "护肤", "style": "澳洲植物护肤、极简哲思" }
   ]
 }
