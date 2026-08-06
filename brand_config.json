@@ -26,6 +26,7 @@
     { "name": "香奈儿", "industry": "奢侈品", "style": "顶级奢侈、法式优雅" },
     { "name": "迪奥", "industry": "奢侈品", "style": "顶级奢侈、华丽浪漫" },
     { "name": "古驰", "industry": "奢侈品", "style": "顶级奢侈、复古华丽" },
+    { "name": "Tiffany & Co.", "industry": "奢侈品", "style": "经典珠宝、蒂芙尼蓝" },
     { "name": "喜茶", "industry": "茶饮", "style": "新式茶饮、灵感之茶" },
     { "name": "霸王茶姬", "industry": "茶饮", "style": "国风茶饮、原叶鲜奶茶" },
     { "name": "茉莉奶白", "industry": "茶饮", "style": "花香茶饮、茉莉鲜奶" },
