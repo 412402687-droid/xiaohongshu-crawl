@@ -29,6 +29,8 @@
     { "name": "茉莉奶白", "industry": "茶饮", "style": "花香茶饮、茉莉鲜奶" },
     { "name": "观夏", "industry": "香水", "style": "东方植物香、东方美学" },
     { "name": "闻献", "industry": "香水", "style": "国产高端香氛、禅酷美学" },
-    { "name": "大人糖", "industry": "个护", "style": "女性愉悦、新消费品" }
+    { "name": "大人糖", "industry": "个护", "style": "女性愉悦、新消费品" },
+    { "name": "雏菊的天空", "industry": "护肤", "style": "植物芳疗护肤、自然纯净" },
+    { "name": "野兽派", "industry": "生活方式", "style": "高端艺术花礼、生活美学" }
   ]
 }
