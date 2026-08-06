@@ -1,0 +1,13 @@
+{
+  "date": "2026-08-06",
+  "source": "小红书品牌主页游客模式测试",
+  "note": "VPN + 本机 Chrome headless，第一轮成功，后续被限流",
+  "results": [
+    {"brand": "兰蔻", "uid": "5b9a0af31a43810001f90218", "notes_found": 10, "status": "✅"},
+    {"brand": "观夏", "uid": "56139e188a75e150292cd217", "notes_found": 11, "status": "✅"},
+    {"brand": "喜茶", "uid": "5b2b42474eacab7d870eff8f", "notes_found": 10, "status": "✅"},
+    {"brand": "野兽派", "uid": "59cb357a82ec397699f7cb03", "notes_found": 12, "status": "✅"},
+    {"brand": "花西子", "uid": "55d34272f5a26377d1b784dd", "notes_found": 0, "status": "❌ 超时"}
+  ],
+  "summary": "5品牌测试，4个成功获取笔记链接（共43条），但游客模式无法提取标题/正文内容"
+}
