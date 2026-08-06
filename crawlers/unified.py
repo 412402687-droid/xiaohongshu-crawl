@@ -11,6 +11,17 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# 系统 Chrome 路径（避免下载 Playwright 自带的 170MB 浏览器）
+_CHROME_EXE = None
+for _p in [
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"),
+]:
+    if os.path.exists(_p):
+        _CHROME_EXE = _p
+        break
+
 from crawlers.cbndata import CBNDataCrawler
 from crawlers.iimedia import IIMediaCrawler
 from crawlers.djyanbao import DJYanbaoCrawler
@@ -32,6 +43,7 @@ async def crawl_all_sources(brands: list, max_per_source: int = 5) -> dict:
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
+            executable_path=_CHROME_EXE,
             args=[
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
@@ -97,6 +109,7 @@ async def crawl_topic_keywords(keywords: list, max_results: int = 15) -> list:
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
+            executable_path=_CHROME_EXE,
             args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"],
         )
         context = await browser.new_context(
