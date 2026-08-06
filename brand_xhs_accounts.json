@@ -1,7 +1,7 @@
 {
   "note": "品牌小红书官方账号，user_id 可在对应主页 URL 中找到",
   "accounts": [
-    { "brand": "花西子", "handle": "花西子Florasis", "user_id": "", "note": "待确认" },
+    { "brand": "花西子", "handle": "花西子Florasis", "user_id": "55d34272f5a26377d1b784dd", "note": "已验证" },
     { "brand": "完美日记", "handle": "完美日记PerfectDiary", "user_id": "", "note": "待确认" },
     { "brand": "橘朵", "handle": "橘朵Judydoll", "user_id": "", "note": "待确认" },
     { "brand": "彩棠", "handle": "彩棠Timage", "user_id": "", "note": "待确认" },
@@ -12,7 +12,7 @@
     { "brand": "薇诺娜", "handle": "薇诺娜WINONA", "user_id": "", "note": "待确认" },
     { "brand": "瑷尔博士", "handle": "瑷尔博士DrAlva", "user_id": "", "note": "待确认" },
     { "brand": "可复美", "handle": "可复美", "user_id": "", "note": "待确认" },
-    { "brand": "兰蔻", "handle": "兰蔻Lancome", "user_id": "", "note": "待确认" },
+    { "brand": "兰蔻", "handle": "兰蔻Lancome", "user_id": "5b9a0af31a43810001f90218", "note": "已验证" },
     { "brand": "雏菊的天空", "handle": "雏菊的天空DaisySky", "user_id": "", "note": "待确认" },
     { "brand": "优衣库", "handle": "优衣库UNIQLO", "user_id": "", "note": "待确认" },
     { "brand": "ZARA", "handle": "ZARA", "user_id": "", "note": "待确认" },
@@ -28,16 +28,18 @@
     { "brand": "香奈儿", "handle": "香奈儿CHANEL", "user_id": "", "note": "待确认" },
     { "brand": "迪奥", "handle": "迪奥Dior", "user_id": "", "note": "待确认" },
     { "brand": "古驰", "handle": "古驰GUCCI", "user_id": "", "note": "待确认" },
-    { "brand": "喜茶", "handle": "喜茶HEYTEA", "user_id": "", "note": "待确认" },
+    { "brand": "喜茶", "handle": "喜茶HEYTEA", "user_id": "5b2b42474eacab7d870eff8f", "note": "已验证" },
     { "brand": "霸王茶姬", "handle": "霸王茶姬CHAGEE", "user_id": "", "note": "待确认" },
     { "brand": "茉莉奶白", "handle": "茉莉奶白", "user_id": "", "note": "待确认" },
-    { "brand": "观夏", "handle": "观夏ToSummer", "user_id": "", "note": "待确认" },
+    { "brand": "观夏", "handle": "观夏ToSummer", "user_id": "56139e188a75e150292cd217", "note": "已验证" },
     { "brand": "闻献", "handle": "闻献DOCUMENTS", "user_id": "", "note": "待确认" },
     { "brand": "大人糖", "handle": "大人糖", "user_id": "", "note": "待确认" },
-    { "brand": "野兽派", "handle": "野兽派THEBEAST", "user_id": "", "note": "待确认" },
+    { "brand": "野兽派", "handle": "野兽派THEBEAST", "user_id": "59cb357a82ec397699f7cb03", "note": "已验证" },
     { "brand": "Bollycon", "handle": "Bollycon", "user_id": "", "note": "待确认" },
     { "brand": "moody", "handle": "moody美瞳", "user_id": "", "note": "待确认" },
     { "brand": "CoFancy可糖", "handle": "CoFancy可糖", "user_id": "", "note": "待确认" },
-    { "brand": "可啦啦Kilala", "handle": "可啦啦Kilala", "user_id": "", "note": "待确认" }
+    { "brand": "可啦啦Kilala", "handle": "可啦啦Kilala", "user_id": "", "note": "待确认" },
+    { "brand": "Le Labo", "handle": "LeLabo", "user_id": "", "note": "待确认" },
+    { "brand": "伊索 Aesop", "handle": "Aesop伊索", "user_id": "", "note": "待确认" }
   ]
 }

@@ -37,6 +37,8 @@
     { "name": "Bollycon", "industry": "美瞳", "style": "日系自然混血美瞳、舒适水润" },
     { "name": "moody", "industry": "美瞳", "style": "国货美瞳头部、潮流花色" },
     { "name": "CoFancy可糖", "industry": "美瞳", "style": "新锐彩瞳品牌、高颜值花色" },
-    { "name": "可啦啦Kilala", "industry": "美瞳", "style": "线上销量领先、日抛专家" }
+    { "name": "可啦啦Kilala", "industry": "美瞳", "style": "线上销量领先、日抛专家" },
+    { "name": "Le Labo", "industry": "香水", "style": "纽约小众手工香水、侘寂美学" },
+    { "name": "伊索 Aesop", "industry": "护肤", "style": "澳洲植物护肤、极简哲思" }
   ]
 }
