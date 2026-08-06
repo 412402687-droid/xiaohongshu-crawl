@@ -33,6 +33,10 @@
     { "name": "闻献", "industry": "香水", "style": "国产高端香氛、禅酷美学" },
     { "name": "大人糖", "industry": "个护", "style": "女性愉悦、新消费品" },
     { "name": "雏菊的天空", "industry": "护肤", "style": "植物芳疗护肤、自然纯净" },
-    { "name": "野兽派", "industry": "生活方式", "style": "高端艺术花礼、生活美学" }
+    { "name": "野兽派", "industry": "生活方式", "style": "高端艺术花礼、生活美学" },
+    { "name": "Bollycon", "industry": "美瞳", "style": "日系自然混血美瞳、舒适水润" },
+    { "name": "moody", "industry": "美瞳", "style": "国货美瞳头部、潮流花色" },
+    { "name": "CoFancy可糖", "industry": "美瞳", "style": "新锐彩瞳品牌、高颜值花色" },
+    { "name": "可啦啦Kilala", "industry": "美瞳", "style": "线上销量领先、日抛专家" }
   ]
 }
