@@ -56,7 +56,7 @@ else:
         batch = targets[i : i + 500]
         payload = {
             "records": [
-                {"record_id": rid, "fields": {"笔记链接": ""}}
+                {"record_id": rid, "fields": {"笔记链接": None}}
                 for rid in batch
             ]
         }
@@ -66,9 +66,15 @@ else:
             json=payload,
             timeout=30,
         )
-        code = r.json().get("code")
-        print(f"  批次 {i // 500 + 1}: code={code}")
-        if code == 0:
-            cleared += len(batch)
+        # 打印原始响应（诊断）
+        raw = r.text[:300]
+        print(f"  批次 {i // 500 + 1}: HTTP {r.status_code} | {raw}")
+        try:
+            data = r.json()
+            code = data.get("code")
+            if code == 0:
+                cleared += len(batch)
+        except Exception as e:
+            print(f"  JSON解析失败: {e}")
 
     print(f"成功清空 {cleared} 条小红书链接")
