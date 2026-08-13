@@ -10,8 +10,10 @@
 
 import json
 import os
+import re
 import sys
 import time
+from datetime import datetime
 
 import requests
 
@@ -95,7 +97,8 @@ FIELD_ALIASES = [
 ]
 
 # 标准字段 → 飞书字段类型
-URL_FIELD_TYPE = 5  # 超链接
+URL_FIELD_TYPE = 15      # 超链接 (url)
+DATETIME_FIELD_TYPE = 5  # 日期 (date_time)
 
 
 def build_field_map(real_fields: dict) -> dict:
@@ -125,6 +128,30 @@ def _format_url_value(field_type: int, url: str, text: str):
     if field_type == URL_FIELD_TYPE:
         return {"link": url, "text": text or "查看原文"}
     return url  # 文本类型直接给 URL 字符串
+
+
+def _parse_date_to_ts(date_str) -> int:
+    """
+    将各种日期字符串解析为毫秒时间戳（飞书日期字段要求）。
+
+    支持：2025-12-28 / 2026年8月6日 / 2025-12-28T16:00:00.000Z
+    返回 None 表示无法解析。
+    """
+    if not date_str:
+        return None
+    s = str(date_str).strip()
+    try:
+        m = re.match(r"(\d{4})-(\d{1,2})-(\d{1,2})", s)
+        if m:
+            y, mo, d = map(int, m.groups())
+            return int(datetime(y, mo, d).timestamp() * 1000)
+        m = re.match(r"(\d{4})年(\d{1,2})月(\d{1,2})日", s)
+        if m:
+            y, mo, d = map(int, m.groups())
+            return int(datetime(y, mo, d).timestamp() * 1000)
+    except Exception:
+        pass
+    return None
 
 
 # ── 记录构建 ──────────────────────────────────────────
@@ -158,6 +185,11 @@ def build_article_fields(article: dict, field_map: dict, real_fields: dict) -> d
         val = data.get(std_name, "")
         if std_name == "url":
             val = _format_url_value(ftype, data["url"], data["title"])
+        elif std_name == "date" and ftype == DATETIME_FIELD_TYPE:
+            ts = _parse_date_to_ts(val)
+            if ts is None:
+                continue  # 日期无法解析，跳过该字段
+            val = ts
         elif ftype == 2 and isinstance(val, str) and val.isdigit():
             val = int(val)
         fields[real_name] = val
@@ -208,12 +240,14 @@ def write_multi_source_data(articles, app_token, table_id, token) -> int:
     # 1. 获取真实字段
     try:
         real_fields = list_table_fields(app_token, table_id, token)
-        print(f"[飞书] 表格字段: {list(real_fields.keys())}")
+        # 打印字段名 + 类型号（便于诊断）
+        detail = {k: v for k, v in real_fields.items()}
+        print(f"[飞书] 表格字段(名=类型): {detail}")
     except Exception as exc:
         print(f"[飞书] 获取字段失败: {exc}，使用默认字段名")
         real_fields = {
-            "品牌名称": 1, "笔记标题": 1, "笔记链接": 5, "笔记类型": 1,
-            "作者": 1, "发布时间": 1, "抓取时间": 1, "抓取日期": 1,
+            "品牌名称": 1, "笔记标题": 1, "笔记链接": 15, "笔记类型": 1,
+            "作者": 1, "发布时间": 5, "抓取时间": 1, "抓取日期": 1,
         }
 
     # 2. 构建字段映射
