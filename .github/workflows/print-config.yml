@@ -1,0 +1,16 @@
+name: 打印飞书配置
+
+on:
+  workflow_dispatch:
+
+jobs:
+  print-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 打印飞书表格链接
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
+          FEISHU_TABLE_ID: ${{ secrets.FEISHU_TABLE_ID }}
+        run: python3 print_feishu_config.py
