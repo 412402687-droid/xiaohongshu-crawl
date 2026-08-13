@@ -60,7 +60,7 @@ else:
                 for rid in batch
             ]
         }
-        r = requests.patch(
+        r = requests.post(
             f"https://open.feishu.cn/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_update",
             headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
             json=payload,
