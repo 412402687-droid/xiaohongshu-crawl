@@ -25,6 +25,7 @@ for _p in [
 from crawlers.cbndata import CBNDataCrawler
 from crawlers.iimedia import IIMediaCrawler
 from crawlers.djyanbao import DJYanbaoCrawler
+from crawlers.pinguan import PinGuanCrawler
 
 
 async def crawl_all_sources(brands: list, max_per_source: int = 5) -> dict:

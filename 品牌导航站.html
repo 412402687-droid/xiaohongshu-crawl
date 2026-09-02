@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品牌导航站</title>
+<style>
+:root {
+  --bg: #f7f5f2;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #8a8a8a;
+  --border: #e8e4df;
+  --accent: #d4380d;
+  --xhs: #ff2442;
+  --douyin: #161823;
+  --radius: 16px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+header {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(247,245,242,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 24px;
+}
+.header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.logo span { color: var(--accent); }
+.count { color: var(--muted); font-size: 13px; }
+.search-box { margin-left: auto; position: relative; }
+.search-box input {
+  width: 260px; padding: 10px 16px 10px 38px;
+  border: 1px solid var(--border); border-radius: 24px;
+  font-size: 14px; outline: none; background: #fff; transition: 0.2s;
+}
+.search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,56,13,0.1); }
+.search-box::before { content: "🔍"; position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; }
+.tabs {
+  max-width: 1200px; margin: 20px auto 0; padding: 0 24px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.tab {
+  padding: 7px 16px; border-radius: 20px; cursor: pointer;
+  font-size: 14px; border: 1px solid var(--border);
+  background: #fff; color: var(--muted); transition: 0.2s; white-space: nowrap;
+}
+.tab:hover { border-color: var(--accent); color: var(--accent); }
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+main { max-width: 1200px; margin: 20px auto 60px; padding: 0 24px; }
+.industry-title { font-size: 18px; font-weight: 700; margin: 28px 0 14px; display: flex; align-items: center; gap: 10px; }
+.industry-title .bar { width: 4px; height: 18px; background: var(--accent); border-radius: 2px; }
+.industry-title .num { font-size: 13px; color: var(--muted); font-weight: 400; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow);
+  transition: 0.2s; display: flex; flex-direction: column; gap: 10px;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.card .name { font-size: 17px; font-weight: 700; }
+.card .style { font-size: 12px; color: var(--muted); min-height: 34px; }
+.card .links { display: flex; gap: 8px; margin-top: auto; }
+.link-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  text-decoration: none; transition: 0.2s;
+}
+.link-btn.xhs { background: rgba(255,36,66,0.08); color: var(--xhs); }
+.link-btn.xhs:hover { background: var(--xhs); color: #fff; }
+.link-btn.douyin { background: rgba(22,24,35,0.06); color: var(--douyin); }
+.link-btn.douyin:hover { background: var(--douyin); color: #fff; }
+.empty { text-align: center; color: var(--muted); padding: 60px 0; font-size: 15px; }
+@media (max-width: 600px) {
+  .search-box { width: 100%; margin-left: 0; }
+  .search-box input { width: 100%; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo">品牌<span>导航</span></div>
+    <div class="count" id="count"></div>
+    <div class="search-box"><input type="text" id="search" placeholder="搜索品牌名..."></div>
+  </div>
+</header>
+<div class="tabs" id="tabs"></div>
+<main id="main"></main>
+<script>
+const BRANDS = [{"name": "花西子", "industry": "美妆", "style": "国风彩妆、东方美学", "xiaohongshu": "https://www.xiaohongshu.com/user/profile/55d34272f5a26377d1b784dd", "douyin": "https://www.douyin.com/user/MS4wLjABAAAAbuHYNKxJTkABz4eBSw-YwFv-gH_iBv6KIX_RIj-FQws"}, {"name": "完美日记", "industry": "美妆", "style": "新锐彩妆、年轻潮流", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=完美日记", "douyin": "https://www.douyin.com/search/完美日记"}, {"name": "橘朵", "industry": "美妆", "style": "平价彩妆、少女甜酷", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=橘朵", "douyin": "https://www.douyin.com/search/橘朵"}, {"name": "彩棠", "industry": "美妆", "style": "专业彩妆、中式骨相", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=彩棠", "douyin": "https://www.douyin.com/search/彩棠"}, {"name": "毛戈平", "industry": "美妆", "style": "高端彩妆、大师光影", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=毛戈平", "douyin": "https://www.douyin.com/search/毛戈平"}, {"name": "玛丽黛佳", "industry": "美妆", "style": "新艺术彩妆、先锋国货", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=玛丽黛佳", "douyin": "https://www.douyin.com/search/玛丽黛佳"}, {"name": "优衣库", "industry": "时尚", "style": "基础穿搭、日系极简", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=优衣库", "douyin": "https://www.douyin.com/search/优衣库"}, {"name": "ZARA", "industry": "时尚", "style": "快时尚、欧美潮流", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=ZARA", "douyin": "https://www.douyin.com/search/ZARA"}, {"name": "蕉内", "industry": "时尚", "style": "内衣家居、科技面料", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=蕉内", "douyin": "https://www.douyin.com/search/蕉内"}, {"name": "太平鸟", "industry": "时尚", "style": "国潮时尚、年轻通勤", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=太平鸟", "douyin": "https://www.douyin.com/search/太平鸟"}, {"name": "MLBK", "industry": "时尚", "style": "运动时尚、街头潮流", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=MLBK", "douyin": "https://www.douyin.com/search/MLBK"}, {"name": "蔻驰", "industry": "包具", "style": "轻奢包袋、美式经典", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=蔻驰", "douyin": "https://www.douyin.com/search/蔻驰"}, {"name": "小CK", "industry": "包具", "style": "快时尚包袋、平价精致", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=小CK", "douyin": "https://www.douyin.com/search/小CK"}, {"name": "古良吉吉", "industry": "包具", "style": "原创设计、复古文艺", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=古良吉吉", "douyin": "https://www.douyin.com/search/古良吉吉"}, {"name": "崧SONG", "industry": "包具", "style": "原创包袋、东方极简", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=崧SONG", "douyin": "https://www.douyin.com/search/崧SONG"}, {"name": "Songmont山下有松", "industry": "包具", "style": "原创设计师包袋、东方极简美学", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Songmont山下有松", "douyin": "https://www.douyin.com/search/Songmont山下有松"}, {"name": "雅诗兰黛", "industry": "护肤", "style": "高端护肤、科技抗老", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=雅诗兰黛", "douyin": "https://www.douyin.com/user/MS4wLjABAAAA8vUtKe2o8p5acbn6adU0rNbhBn5a-P-t4DXCx6PrP7c"}, {"name": "珀莱雅", "industry": "护肤", "style": "功效护肤、早C晚A", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=珀莱雅", "douyin": "https://www.douyin.com/search/珀莱雅"}, {"name": "薇诺娜", "industry": "护肤", "style": "敏感肌护肤、医学背景", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=薇诺娜", "douyin": "https://www.douyin.com/search/薇诺娜"}, {"name": "瑷尔博士", "industry": "护肤", "style": "微生态护肤、科学修护", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=瑷尔博士", "douyin": "https://www.douyin.com/search/瑷尔博士"}, {"name": "可复美", "industry": "护肤", "style": "医美护肤、胶原蛋白", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=可复美", "douyin": "https://www.douyin.com/search/可复美"}, {"name": "兰蔻", "industry": "护肤", "style": "法式奢护、科技抗老", "xiaohongshu": "https://www.xiaohongshu.com/user/profile/5b9a0af31a43810001f90218", "douyin": "https://www.douyin.com/search/兰蔻"}, {"name": "LV", "industry": "奢侈品", "style": "顶级奢侈、旅行精神", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=LV", "douyin": "https://www.douyin.com/search/LV"}, {"name": "香奈儿", "industry": "奢侈品", "style": "顶级奢侈、法式优雅", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=香奈儿", "douyin": "https://www.douyin.com/search/香奈儿"}, {"name": "迪奥", "industry": "奢侈品", "style": "顶级奢侈、华丽浪漫", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=迪奥", "douyin": "https://www.douyin.com/search/迪奥"}, {"name": "古驰", "industry": "奢侈品", "style": "顶级奢侈、复古华丽", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=古驰", "douyin": "https://www.douyin.com/search/古驰"}, {"name": "Tiffany & Co.", "industry": "奢侈品", "style": "经典珠宝、蒂芙尼蓝", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Tiffany & Co.", "douyin": "https://www.douyin.com/search/Tiffany & Co."}, {"name": "喜茶", "industry": "茶饮", "style": "新式茶饮、灵感之茶", "xiaohongshu": "https://www.xiaohongshu.com/user/profile/5b2b42474eacab7d870eff8f", "douyin": "https://www.douyin.com/user/MS4wLjABAAAAzzgopACopVAaE5hDjJYz33Vh2rbPe2JRx65WmV30eDU2gl-x3inNpL0V20hWC_k3"}, {"name": "霸王茶姬", "industry": "茶饮", "style": "国风茶饮、原叶鲜奶茶", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=霸王茶姬", "douyin": "https://www.douyin.com/search/霸王茶姬"}, {"name": "茉莉奶白", "industry": "茶饮", "style": "花香茶饮、茉莉鲜奶", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=茉莉奶白", "douyin": "https://www.douyin.com/search/茉莉奶白"}, {"name": "观夏", "industry": "香水", "style": "东方植物香、东方美学", "xiaohongshu": "https://www.xiaohongshu.com/user/profile/56139e188a75e150292cd217", "douyin": "https://www.douyin.com/search/观夏"}, {"name": "闻献", "industry": "香水", "style": "国产高端香氛、禅酷美学", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=闻献", "douyin": "https://www.douyin.com/search/闻献"}, {"name": "大人糖", "industry": "个护", "style": "女性愉悦、新消费品", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=大人糖", "douyin": "https://www.douyin.com/search/大人糖"}, {"name": "雏菊的天空", "industry": "护肤", "style": "植物芳疗护肤、自然纯净", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=雏菊的天空", "douyin": "https://www.douyin.com/search/雏菊的天空"}, {"name": "欧舒丹", "industry": "护肤", "style": "法式植萃身体护理、普罗旺斯", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=欧舒丹", "douyin": "https://www.douyin.com/search/欧舒丹"}, {"name": "野兽派", "industry": "生活方式", "style": "高端艺术花礼、生活美学", "xiaohongshu": "https://www.xiaohongshu.com/user/profile/59cb357a82ec397699f7cb03", "douyin": "https://www.douyin.com/user/MS4wLjABAAAA5olhbrtNAR_6Ws9PanazwrvuFrBss2e6E4tVpd3XoqU"}, {"name": "Bollycon", "industry": "美瞳", "style": "日系自然混血美瞳、舒适水润", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Bollycon", "douyin": "https://www.douyin.com/search/Bollycon"}, {"name": "moody", "industry": "美瞳", "style": "国货美瞳头部、潮流花色", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=moody", "douyin": "https://www.douyin.com/search/moody"}, {"name": "CoFancy可糖", "industry": "美瞳", "style": "新锐彩瞳品牌、高颜值花色", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=CoFancy可糖", "douyin": "https://www.douyin.com/search/CoFancy可糖"}, {"name": "可啦啦Kilala", "industry": "美瞳", "style": "线上销量领先、日抛专家", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=可啦啦Kilala", "douyin": "https://www.douyin.com/search/可啦啦Kilala"}, {"name": "Le Labo", "industry": "香水", "style": "纽约小众手工香水、侘寂美学", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Le Labo", "douyin": "https://www.douyin.com/search/Le Labo"}, {"name": "BYREDO", "industry": "香水", "style": "瑞典极简沙龙香、北欧美学", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=BYREDO", "douyin": "https://www.douyin.com/search/BYREDO"}, {"name": "Diptyque", "industry": "香水", "style": "法式艺术香氛、香薰蜡烛", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Diptyque", "douyin": "https://www.douyin.com/search/Diptyque"}, {"name": "Jo Malone", "industry": "香水", "style": "英伦香氛、叠香艺术", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=Jo Malone", "douyin": "https://www.douyin.com/search/Jo Malone"}, {"name": "馥郁满铺", "industry": "香水", "style": "中式文人香氛、东方叙事", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=馥郁满铺", "douyin": "https://www.douyin.com/search/馥郁满铺"}, {"name": "伊索 Aesop", "industry": "护肤", "style": "澳洲植物护肤、极简哲思", "xiaohongshu": "https://www.xiaohongshu.com/search_result?keyword=伊索 Aesop", "douyin": "https://www.douyin.com/search/伊索 Aesop"}];
+
+const INDUSTRY_COLORS = {
+  "美妆": "#fce4ec", "护肤": "#e8f5e9", "时尚": "#e3f2fd", "包具": "#f3e5f5",
+  "奢侈品": "#fff3e0", "茶饮": "#e0f7fa", "香水": "#f9fbe7", "个护": "#fce4ec",
+  "生活方式": "#ede7f6", "美瞳": "#e8eaf6"
+};
+
+let activeIndustry = "全部";
+
+function renderTabs() {
+  const industries = ["全部", ...new Set(BRANDS.map(b => b.industry))];
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.innerHTML = industries.map(ind =>
+    `<div class="tab ${ind === activeIndustry ? 'active' : ''}" data-ind="${ind}">${ind}</div>`
+  ).join("");
+  tabsEl.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => {
+      activeIndustry = t.dataset.ind;
+      renderTabs();
+      renderBrands();
+    });
+  });
+}
+
+function renderBrands() {
+  const keyword = document.getElementById("search").value.trim().toLowerCase();
+  const filtered = BRANDS.filter(b => {
+    const matchInd = activeIndustry === "全部" || b.industry === activeIndustry;
+    const matchKw = !keyword || b.name.toLowerCase().includes(keyword) || b.style.toLowerCase().includes(keyword);
+    return matchInd && matchKw;
+  });
+
+  document.getElementById("count").textContent = `${BRANDS.length} 个品牌 · 10 个行业`;
+
+  const main = document.getElementById("main");
+  if (!filtered.length) {
+    main.innerHTML = '<div class="empty">没有匹配的品牌</div>';
+    return;
+  }
+
+  // 按行业分组（"全部"时）
+  let html = "";
+  if (activeIndustry === "全部") {
+    const groups = {};
+    filtered.forEach(b => { (groups[b.industry] = groups[b.industry] || []).push(b); });
+    for (const [ind, list] of Object.entries(groups)) {
+      html += `<div class="industry-title"><span class="bar"></span>${ind}<span class="num">${list.length} 个</span></div>`;
+      html += `<div class="grid">${list.map(cardHtml).join("")}</div>`;
+    }
+  } else {
+    html = `<div class="grid">${filtered.map(cardHtml).join("")}</div>`;
+  }
+  main.innerHTML = html;
+}
+
+function cardHtml(b) {
+  return `<div class="card">
+    <div class="name">${b.name}</div>
+    <div class="style">${b.style}</div>
+    <div class="links">
+      <a class="link-btn xhs" href="${b.xiaohongshu}" target="_blank" rel="noopener">小红书</a>
+      <a class="link-btn douyin" href="${b.douyin}" target="_blank" rel="noopener">抖音</a>
+    </div>
+  </div>`;
+}
+
+document.getElementById("search").addEventListener("input", renderBrands);
+renderTabs();
+renderBrands();
+</script>
+</body>
+</html>
