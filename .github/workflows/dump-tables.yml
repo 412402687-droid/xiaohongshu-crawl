@@ -12,9 +12,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: 列出飞书表
+      - name: dump 字段和样本
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
-        run: python dump_feishu_tables.py
+          FEISHU_TABLE_ID: ${{ secrets.FEISHU_TABLE_ID }}
+        run: python dump_feishu_records.py
