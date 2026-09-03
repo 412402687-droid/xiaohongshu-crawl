@@ -1,63 +1,79 @@
-"""品牌展厅站生成器 — 46品牌，a-scene-showroom 格式（图1+图3）
+"""品牌展厅站生成器 v2 — 数据源 Excel（品牌监控清单），封面本地图，只小红书链接"""
 
-数据源：brand_config.json（46品牌）+ brand_xhs_accounts.json + brand_links.json
-首页：左侧品类筛选 + 右侧品牌卡片网格（图1格式）
-详情：点击品牌弹 modal（图3格式：大图+品牌信息+平台按钮）
-"""
-
+import base64
 import json
 import os
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT = os.path.join(BASE, "品牌展厅站.html")
 
+MIME = {
+    "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+    "webp": "image/webp", "gif": "image/gif", "svg": "image/svg+xml",
+}
+MAX_BYTES = 500 * 1024  # 封面图最大 500KB，超过用色块兜底
 
-def load_brands():
-    with open(os.path.join(BASE, "brand_config.json"), "r", encoding="utf-8") as f:
-        return json.load(f)["brands"]
+
+def detect_fmt(path):
+    with open(path, "rb") as f:
+        head = f.read(16)
+    if head.startswith(b"\x89PNG"):
+        return "png"
+    if head.startswith(b"\xff\xd8"):
+        return "jpg"
+    if head.startswith(b"GIF"):
+        return "gif"
+    if head[:4] == b"RIFF" and b"WEBP" in head:
+        return "webp"
+    if b"<svg" in head.lower() or b"<svg" in head:
+        return "svg"
+    return "png"
 
 
-def load_xhs_ids():
-    result = {}
-    p = os.path.join(BASE, "brand_xhs_accounts.json")
+def load_brand_data():
+    p = os.path.join(BASE, "brand_data.json")
     if os.path.exists(p):
         with open(p, "r", encoding="utf-8") as f:
-            for acc in json.load(f).get("accounts", []):
-                if acc.get("user_id"):
-                    result[acc["brand"]] = acc["user_id"]
-    return result
+            return json.load(f)
+    return []
 
 
-def load_custom_links():
-    p = os.path.join(BASE, "brand_links.json")
+def load_images():
+    p = os.path.join(BASE, "brand_images.json")
     if os.path.exists(p):
         with open(p, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
 
+def img_to_base64(brand):
+    """返回 data URI，失败/太大返回空字符串"""
+    images = load_images()
+    rel = images.get(brand, "")
+    if not rel:
+        return ""
+    path = os.path.join(BASE, rel)
+    if not os.path.exists(path):
+        return ""
+    if os.path.getsize(path) > MAX_BYTES:
+        return ""  # 太大，用色块
+    fmt = detect_fmt(path)
+    mime = MIME.get(fmt, "image/png")
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    return f"data:{mime};base64,{b64}"
+
+
 def build():
-    brands = load_brands()
-    xhs_ids = load_xhs_ids()
-    custom = load_custom_links()
+    brands = load_brand_data()
     data = []
     for b in brands:
-        name = b["name"]
-        c = custom.get(name, {})
-        xhs = c.get("xiaohongshu", "")
-        if not xhs and name in xhs_ids:
-            xhs = f"https://www.xiaohongshu.com/user/profile/{xhs_ids[name]}"
-        if not xhs:
-            xhs = f"https://www.xiaohongshu.com/search_result?keyword={name}"
-        douyin = c.get("douyin", "")
-        if not douyin:
-            douyin = f"https://www.douyin.com/search/{name}"
         data.append({
-            "name": name,
-            "category": b["industry"],   # 品类
-            "style": b["style"],         # 调性/描述
-            "xhs": xhs,
-            "douyin": douyin,
+            "name": b["name"],
+            "category": b["category"],
+            "style": b.get("style", ""),
+            "xhs": b.get("xhs", ""),
+            "cover": img_to_base64(b["name"]),
         })
     return data
 
@@ -93,18 +109,21 @@ main { flex: 1; padding: 32px 40px; }
 .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: 0.2s; }
 .card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
-.cover { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; font-weight: 700; letter-spacing: 1px; }
+.cover { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cover img { width: 100%; height: 100%; object-fit: contain; padding: 20px; }
+.cover .fallback { color: #fff; font-size: 30px; font-weight: 700; letter-spacing: 1px; }
 .card-body { padding: 14px 16px; }
 .card-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .card-desc { font-size: 12px; color: #555; min-height: 34px; line-height: 1.5; }
 .card-tags { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
 .card-tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: #f4f1ec; color: var(--muted); }
-/* Modal */
 .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; }
 .modal-mask.open { display: flex; }
 .modal { background: #fff; border-radius: 16px; max-width: 1000px; width: 92%; max-height: 88vh; display: flex; overflow: hidden; position: relative; }
 .modal-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.05); border: none; cursor: pointer; font-size: 18px; z-index: 2; }
-.modal-img { width: 50%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; font-weight: 700; }
+.modal-img { width: 50%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.modal-img img { width: 100%; height: 100%; object-fit: contain; padding: 30px; }
+.modal-img .fallback { color: #fff; font-size: 48px; font-weight: 700; }
 .modal-info { width: 50%; padding: 40px 32px; overflow-y: auto; }
 .modal-name { font-size: 30px; font-weight: 700; margin-bottom: 6px; }
 .modal-cat { display: inline-block; font-size: 11px; color: var(--accent); border: 1px solid var(--accent); padding: 2px 10px; border-radius: 12px; margin-bottom: 16px; }
@@ -114,11 +133,8 @@ main { flex: 1; padding: 32px 40px; }
 .modal-table td:first-child { color: var(--muted); width: 80px; }
 .modal-cta { display: flex; gap: 10px; }
 .cta-btn { flex: 1; padding: 11px 14px; border-radius: 22px; font-size: 13px; font-weight: 600; text-decoration: none; text-align: center; transition: 0.2s; border: 1px solid var(--border); color: var(--text); background: #fff; }
-.cta-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
 .cta-btn.xhs { background: #ff2442; color: #fff; border: none; }
 .cta-btn.xhs:hover { opacity: 0.85; }
-.cta-btn.dy { background: #161823; color: #fff; border: none; }
-.cta-btn.dy:hover { opacity: 0.85; }
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
   aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
@@ -154,8 +170,7 @@ main { flex: 1; padding: 32px 40px; }
         <tr><td>调性</td><td id="m-style"></td></tr>
       </table>
       <div class="modal-cta">
-        <a class="cta-btn xhs" id="m-xhs" href="#" target="_blank">小红书</a>
-        <a class="cta-btn dy" id="m-dy" href="#" target="_blank">抖音</a>
+        <a class="cta-btn xhs" id="m-xhs" href="#" target="_blank">小红书官号</a>
       </div>
     </div>
   </div>
@@ -164,17 +179,18 @@ main { flex: 1; padding: 32px 40px; }
 const BRANDS = __DATA__;
 const COLORS = ['#c8a47e','#7a8b6f','#a8806b','#8a7e6e','#6b7a8b','#a89580','#9b8b6e','#b89a7a','#7c8a76','#a49080','#8a7c70','#b09a82','#978670','#a88770','#8e7d68','#c39a7b','#7d8b80','#a98a72'];
 let activeCat = '全部';
-
 function uniq(f) { return [...new Set(BRANDS.map(b => b[f]))]; }
 function colorFor(name) { let h=0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return COLORS[h%COLORS.length]; }
-
+function coverHtml(b) {
+  if (b.cover) return `<img src="${b.cover}" alt="${b.name}">`;
+  return `<span class="fallback">${b.name}</span>`;
+}
 function renderTags() {
   const el = document.getElementById('tags');
   const cats = ['全部', ...uniq('category')];
   el.innerHTML = cats.map(c => `<div class="tag ${activeCat===c?'active':''}" data-c="${c}">${c}</div>`).join('');
   el.querySelectorAll('.tag').forEach(t => t.addEventListener('click', () => { activeCat = t.dataset.c; renderTags(); renderResults(); }));
 }
-
 function renderResults() {
   const kw = document.getElementById('search').value.toLowerCase();
   const list = BRANDS.filter(b => {
@@ -185,7 +201,7 @@ function renderResults() {
   document.getElementById('count').textContent = `${list.length} RESULTS`;
   document.getElementById('results').innerHTML = list.map(b => `
     <div class="card" onclick="openModal('${b.name}')">
-      <div class="cover" style="background:${colorFor(b.name)}">${b.name}</div>
+      <div class="cover" style="background:${colorFor(b.name)}">${coverHtml(b)}</div>
       <div class="card-body">
         <div class="card-name">${b.name}</div>
         <div class="card-desc">${b.style}</div>
@@ -194,23 +210,23 @@ function renderResults() {
     </div>
   `).join('') || '<div style="color:#999;grid-column:1/-1;text-align:center;padding:60px">没有匹配的品牌</div>';
 }
-
 function openModal(name) {
   const b = BRANDS.find(x => x.name === name);
   if (!b) return;
   const c = colorFor(b.name);
-  document.getElementById('m-img').style.background = c;
-  document.getElementById('m-img').textContent = b.name;
+  const imgEl = document.getElementById('m-img');
+  imgEl.style.background = c;
+  imgEl.innerHTML = b.cover ? `<img src="${b.cover}" alt="${b.name}">` : `<span class="fallback">${b.name}</span>`;
   document.getElementById('m-name').textContent = b.name;
   document.getElementById('m-cat').textContent = b.category;
   document.getElementById('m-cat2').textContent = b.category;
   document.getElementById('m-style').textContent = b.style;
   document.getElementById('m-desc').textContent = b.style;
-  document.getElementById('m-xhs').href = b.xhs;
-  document.getElementById('m-dy').href = b.douyin;
+  const xhsBtn = document.getElementById('m-xhs');
+  if (b.xhs) { xhsBtn.href = b.xhs; xhsBtn.style.display = 'flex'; }
+  else { xhsBtn.href = '#'; xhsBtn.style.display = 'none'; }
   document.getElementById('modal').classList.add('open');
 }
-
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
@@ -227,12 +243,13 @@ def main():
     html = HTML.replace("__DATA__", json.dumps(data, ensure_ascii=False)).replace("__COUNT__", str(len(data)))
     with open(OUTPUT, "w", encoding="utf-8") as f:
         f.write(html)
+    n_xhs = sum(1 for d in data if d["xhs"])
+    n_img = sum(1 for d in data if d["cover"])
     print(f"已生成 {OUTPUT}")
     print(f"品牌数: {len(data)}")
-    cats = {}
-    for d in data:
-        cats[d["category"]] = cats.get(d["category"], 0) + 1
-    print("品类分布:", cats)
+    print(f"有小红书链接: {n_xhs} 个")
+    print(f"有封面图: {n_img} 个")
+    print(f"文件大小: {os.path.getsize(OUTPUT)//1024}KB")
 
 
 if __name__ == "__main__":

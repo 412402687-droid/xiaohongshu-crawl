@@ -1,0 +1,302 @@
+[
+  {
+    "name": "花西子",
+    "category": "美妆",
+    "style": "国风彩妆、东方美学",
+    "xhs": "https://www.xiaohongshu.com/user/profile/55d34272f5a26377d1b784dd?xsec_token=ABErF0hrN0CQTYkpKJUpkOWCcRzq2lIOJIkXKn0bUhl68%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "完美日记",
+    "category": "美妆",
+    "style": "新锐彩妆、年轻潮流",
+    "xhs": "https://www.xiaohongshu.com/user/profile/59ae4dfc5e87e72475fb3bf3?xsec_token=ABOQ6Y7xuD_tRue-w2COMtFVKG-s_15UNhvBkMjciFnpg%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "橘朵",
+    "category": "美妆",
+    "style": "平价彩妆、少女甜酷",
+    "xhs": "https://www.xiaohongshu.com/user/profile/595c58526a6a6968ebbe5745?xsec_token=ABoTZ-9ugeQvgEeQjHxREw1FW69g7pxf23Mp7M75VZ52Y%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "彩棠",
+    "category": "美妆",
+    "style": "专业彩妆、中式骨相",
+    "xhs": "https://www.xiaohongshu.com/user/profile/59fd15494eacab35111b2594?xsec_token=ABYqflu4mzAhrmQwefiHloQbVViaWcpqzr1P3FwxsPoVY%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "毛戈平",
+    "category": "美妆",
+    "style": "高端彩妆、大师光影",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5a9661f811be1073511a9f46?xsec_token=ABBq7bBT-6lN3twWQKQw_AbYeaC3w3wqiE4uIdbElPJ8U%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "玛丽黛佳",
+    "category": "美妆",
+    "style": "新艺术彩妆、先锋国货",
+    "xhs": "https://www.xiaohongshu.com/user/profile/59bf32695e87e7086a65c932?xsec_token=ABUK2qKZNjwZByOfvi8ZOKrxHLCI6r28t9tQnC-IPiG3w%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "3CE",
+    "category": "美妆",
+    "style": "平价彩妆",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5c07f6b30000000006015d9b?xsec_token=ABbrnQMIExsezNDdY8c187dqU-GUz-CF1lgrOFG8Bp1OQ%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "优衣库",
+    "category": "时尚",
+    "style": "基础穿搭、日系极简",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5bd6b177d4c0880001bf7f4e?xsec_token=ABnt9yUIqkdazWUYr4Y5fggYMtirEFWI_BNLF_JzBATyE%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "ZARA",
+    "category": "时尚",
+    "style": "快时尚、欧美潮流",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5c2d0262000000000703cf19?xsec_token=ABn0fu9y58RvDvnV02Sj5HWmb2aRO2Rn1zOBsGKcpTz0g%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "蕉内",
+    "category": "时尚",
+    "style": "内衣家居、科技面料",
+    "xhs": ""
+  },
+  {
+    "name": "太平鸟",
+    "category": "时尚",
+    "style": "国潮时尚、年轻通勤",
+    "xhs": ""
+  },
+  {
+    "name": "MLBK",
+    "category": "时尚",
+    "style": "运动时尚、街头潮流",
+    "xhs": ""
+  },
+  {
+    "name": "蔻驰",
+    "category": "包具",
+    "style": "轻奢包袋、美式经典",
+    "xhs": ""
+  },
+  {
+    "name": "小CK",
+    "category": "包具",
+    "style": "快时尚包袋、平价精致",
+    "xhs": ""
+  },
+  {
+    "name": "古良吉吉",
+    "category": "包具",
+    "style": "原创设计、复古文艺",
+    "xhs": ""
+  },
+  {
+    "name": "Songmont山下有松",
+    "category": "包具",
+    "style": "原创设计师包袋、东方极简美学",
+    "xhs": ""
+  },
+  {
+    "name": "雅诗兰黛",
+    "category": "护肤",
+    "style": "高端护肤、科技抗老",
+    "xhs": ""
+  },
+  {
+    "name": "珀莱雅",
+    "category": "护肤",
+    "style": "功效护肤、早C晚A",
+    "xhs": ""
+  },
+  {
+    "name": "薇诺娜",
+    "category": "护肤",
+    "style": "敏感肌护肤、医学背景",
+    "xhs": ""
+  },
+  {
+    "name": "瑷尔博士",
+    "category": "护肤",
+    "style": "微生态护肤、科学修护",
+    "xhs": ""
+  },
+  {
+    "name": "可复美",
+    "category": "护肤",
+    "style": "医美护肤、胶原蛋白",
+    "xhs": ""
+  },
+  {
+    "name": "兰蔻",
+    "category": "护肤",
+    "style": "法式奢护、科技抗老",
+    "xhs": ""
+  },
+  {
+    "name": "雏菊的天空",
+    "category": "护肤",
+    "style": "植物芳疗护肤、自然纯净",
+    "xhs": ""
+  },
+  {
+    "name": "欧舒丹",
+    "category": "护肤",
+    "style": "法式植萃身体护理、普罗旺斯",
+    "xhs": ""
+  },
+  {
+    "name": "伊索 Aesop",
+    "category": "护肤",
+    "style": "澳洲植物护肤、极简哲思",
+    "xhs": ""
+  },
+  {
+    "name": "LV",
+    "category": "奢侈品",
+    "style": "顶级奢侈、旅行精神",
+    "xhs": ""
+  },
+  {
+    "name": "香奈儿",
+    "category": "奢侈品",
+    "style": "顶级奢侈、法式优雅",
+    "xhs": ""
+  },
+  {
+    "name": "迪奥",
+    "category": "奢侈品",
+    "style": "顶级奢侈、华丽浪漫",
+    "xhs": ""
+  },
+  {
+    "name": "古驰",
+    "category": "奢侈品",
+    "style": "顶级奢侈、复古华丽",
+    "xhs": ""
+  },
+  {
+    "name": "Tiffany & Co.",
+    "category": "奢侈品",
+    "style": "经典珠宝、蒂芙尼蓝",
+    "xhs": ""
+  },
+  {
+    "name": "喜茶",
+    "category": "茶饮",
+    "style": "新式茶饮、灵感之茶",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5b2b42474eacab7d870eff8f?xsec_token=AB2P9QqxK9yNoBFfA4QHZkQIQBgBWmXZI0jf6JNkBLDhA%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "霸王茶姬",
+    "category": "茶饮",
+    "style": "国风茶饮、原叶鲜奶茶",
+    "xhs": "https://www.xiaohongshu.com/user/profile/60a4cdd60000000001005da0?xsec_token=ABEMBXHrYv_Y7G5mlZrcS6lGw3gBVM-DMqFOLCHVXid9c%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "茉莉奶白",
+    "category": "茶饮",
+    "style": "花香茶饮、茉莉鲜奶",
+    "xhs": "https://www.xiaohongshu.com/user/profile/605415dd000000000100bf42?xsec_token=ABJiIrWkhDUpLTdFJS3m2h6bfAyQf5j9F8sVIqF8fM11A%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "东方墨兰",
+    "category": "茶饮",
+    "style": "",
+    "xhs": "https://www.xiaohongshu.com/user/profile/5fc088110000000001001634?xsec_token=ABrWLbrlFUfh0OwfxWeoerli8a_xcKeUPOnPHK8khbffA%3D&xsec_source=pc_search"
+  },
+  {
+    "name": "观夏",
+    "category": "香水",
+    "style": "东方植物香、东方美学",
+    "xhs": ""
+  },
+  {
+    "name": "闻献",
+    "category": "香水",
+    "style": "国产高端香氛、禅酷美学",
+    "xhs": ""
+  },
+  {
+    "name": "Le Labo",
+    "category": "香水",
+    "style": "纽约小众手工香水、侘寂美学",
+    "xhs": ""
+  },
+  {
+    "name": "BYREDO",
+    "category": "香水",
+    "style": "瑞典极简沙龙香、北欧美学",
+    "xhs": ""
+  },
+  {
+    "name": "Diptyque",
+    "category": "香水",
+    "style": "法式艺术香氛、香薰蜡烛",
+    "xhs": ""
+  },
+  {
+    "name": "Jo Malone",
+    "category": "香水",
+    "style": "英伦香氛、叠香艺术",
+    "xhs": ""
+  },
+  {
+    "name": "馥郁满铺",
+    "category": "香水",
+    "style": "中式文人香氛、东方叙事",
+    "xhs": ""
+  },
+  {
+    "name": "大人糖",
+    "category": "个护",
+    "style": "女性愉悦、新消费品",
+    "xhs": ""
+  },
+  {
+    "name": "beu",
+    "category": "个护",
+    "style": "新消费品",
+    "xhs": ""
+  },
+  {
+    "name": "野兽派",
+    "category": "生活方式",
+    "style": "高端艺术花礼、生活美学",
+    "xhs": ""
+  },
+  {
+    "name": "无印良品",
+    "category": "生活方式",
+    "style": "",
+    "xhs": ""
+  },
+  {
+    "name": "zara home",
+    "category": "生活方式",
+    "style": "生活美学",
+    "xhs": ""
+  },
+  {
+    "name": "Bollycon",
+    "category": "美瞳",
+    "style": "日系自然混血美瞳、舒适水润",
+    "xhs": ""
+  },
+  {
+    "name": "moody",
+    "category": "美瞳",
+    "style": "国货美瞳头部、潮流花色",
+    "xhs": ""
+  },
+  {
+    "name": "CoFancy可糖",
+    "category": "美瞳",
+    "style": "新锐彩瞳品牌、高颜值花色",
+    "xhs": ""
+  },
+  {
+    "name": "可啦啦Kilala",
+    "category": "美瞳",
+    "style": "线上销量领先、日抛专家",
+    "xhs": ""
+  }
+]
