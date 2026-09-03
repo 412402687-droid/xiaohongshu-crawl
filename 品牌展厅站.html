@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品牌展厅 · SHOWROOM</title>
+<style>
+:root {
+  --bg: #fafaf8; --card: #fff; --text: #1a1a1a; --muted: #888;
+  --border: #e8e6e1; --accent: #d4380d; --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "PingFang SC", sans-serif; background: var(--bg); color: var(--text); line-height: 1.55; font-size: 14px; }
+.layout { display: flex; min-height: 100vh; }
+aside { width: 210px; border-right: 1px solid var(--border); padding: 28px 20px; background: #fff; flex-shrink: 0; }
+.title { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+.subtitle { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+.search-box { position: relative; margin-bottom: 24px; }
+.search-box input { width: 100%; padding: 8px 12px 8px 32px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; background: var(--bg); }
+.search-box::before { content: "🔍"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.5; }
+.filter { margin-bottom: 18px; }
+.filter-label { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px; letter-spacing: 0.5px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { padding: 4px 11px; border-radius: 16px; font-size: 12px; border: 1px solid var(--border); background: #fff; color: var(--muted); cursor: pointer; transition: 0.2s; }
+.tag:hover { border-color: var(--accent); color: var(--accent); }
+.tag.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+main { flex: 1; padding: 32px 40px; }
+.count { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.results { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: 0.2s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+.cover { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; font-weight: 700; letter-spacing: 1px; }
+.card-body { padding: 14px 16px; }
+.card-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card-desc { font-size: 12px; color: #555; min-height: 34px; line-height: 1.5; }
+.card-tags { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
+.card-tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: #f4f1ec; color: var(--muted); }
+/* Modal */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-mask.open { display: flex; }
+.modal { background: #fff; border-radius: 16px; max-width: 1000px; width: 92%; max-height: 88vh; display: flex; overflow: hidden; position: relative; }
+.modal-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.05); border: none; cursor: pointer; font-size: 18px; z-index: 2; }
+.modal-img { width: 50%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; font-weight: 700; }
+.modal-info { width: 50%; padding: 40px 32px; overflow-y: auto; }
+.modal-name { font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.modal-cat { display: inline-block; font-size: 11px; color: var(--accent); border: 1px solid var(--accent); padding: 2px 10px; border-radius: 12px; margin-bottom: 16px; }
+.modal-desc { font-size: 14px; line-height: 1.8; color: #333; margin-bottom: 26px; }
+.modal-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+.modal-table td { padding: 10px 0; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+.modal-table td:first-child { color: var(--muted); width: 80px; }
+.modal-cta { display: flex; gap: 10px; }
+.cta-btn { flex: 1; padding: 11px 14px; border-radius: 22px; font-size: 13px; font-weight: 600; text-decoration: none; text-align: center; transition: 0.2s; border: 1px solid var(--border); color: var(--text); background: #fff; }
+.cta-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+.cta-btn.xhs { background: #ff2442; color: #fff; border: none; }
+.cta-btn.xhs:hover { opacity: 0.85; }
+.cta-btn.dy { background: #161823; color: #fff; border: none; }
+.cta-btn.dy:hover { opacity: 0.85; }
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+  .modal { flex-direction: column; max-height: 92vh; }
+  .modal-img { width: 100%; aspect-ratio: 4/3; }
+  .modal-info { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="title">SHOWROOM</div>
+    <div class="subtitle">品牌展厅 · 46 个品牌</div>
+    <div class="search-box"><input type="text" id="search" placeholder="搜索品牌"></div>
+    <div class="filter"><div class="filter-label">品类</div><div class="tag-list" id="tags"></div></div>
+  </aside>
+  <main>
+    <div class="count" id="count"></div>
+    <div class="results" id="results"></div>
+  </main>
+</div>
+<div class="modal-mask" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-img" id="m-img"></div>
+    <div class="modal-info">
+      <div class="modal-name" id="m-name"></div>
+      <span class="modal-cat" id="m-cat"></span>
+      <div class="modal-desc" id="m-desc"></div>
+      <table class="modal-table">
+        <tr><td>品类</td><td id="m-cat2"></td></tr>
+        <tr><td>调性</td><td id="m-style"></td></tr>
+      </table>
+      <div class="modal-cta">
+        <a class="cta-btn xhs" id="m-xhs" href="#" target="_blank">小红书</a>
+        <a class="cta-btn dy" id="m-dy" href="#" target="_blank">抖音</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const BRANDS = [{"name": "花西子", "category": "美妆", "style": "国风彩妆、东方美学", "xhs": "https://www.xiaohongshu.com/user/profile/55d34272f5a26377d1b784dd", "douyin": "https://www.douyin.com/user/MS4wLjABAAAAbuHYNKxJTkABz4eBSw-YwFv-gH_iBv6KIX_RIj-FQws"}, {"name": "完美日记", "category": "美妆", "style": "新锐彩妆、年轻潮流", "xhs": "https://www.xiaohongshu.com/search_result?keyword=完美日记", "douyin": "https://www.douyin.com/search/完美日记"}, {"name": "橘朵", "category": "美妆", "style": "平价彩妆、少女甜酷", "xhs": "https://www.xiaohongshu.com/search_result?keyword=橘朵", "douyin": "https://www.douyin.com/search/橘朵"}, {"name": "彩棠", "category": "美妆", "style": "专业彩妆、中式骨相", "xhs": "https://www.xiaohongshu.com/search_result?keyword=彩棠", "douyin": "https://www.douyin.com/search/彩棠"}, {"name": "毛戈平", "category": "美妆", "style": "高端彩妆、大师光影", "xhs": "https://www.xiaohongshu.com/search_result?keyword=毛戈平", "douyin": "https://www.douyin.com/search/毛戈平"}, {"name": "玛丽黛佳", "category": "美妆", "style": "新艺术彩妆、先锋国货", "xhs": "https://www.xiaohongshu.com/search_result?keyword=玛丽黛佳", "douyin": "https://www.douyin.com/search/玛丽黛佳"}, {"name": "优衣库", "category": "时尚", "style": "基础穿搭、日系极简", "xhs": "https://www.xiaohongshu.com/search_result?keyword=优衣库", "douyin": "https://www.douyin.com/search/优衣库"}, {"name": "ZARA", "category": "时尚", "style": "快时尚、欧美潮流", "xhs": "https://www.xiaohongshu.com/search_result?keyword=ZARA", "douyin": "https://www.douyin.com/search/ZARA"}, {"name": "蕉内", "category": "时尚", "style": "内衣家居、科技面料", "xhs": "https://www.xiaohongshu.com/search_result?keyword=蕉内", "douyin": "https://www.douyin.com/search/蕉内"}, {"name": "太平鸟", "category": "时尚", "style": "国潮时尚、年轻通勤", "xhs": "https://www.xiaohongshu.com/search_result?keyword=太平鸟", "douyin": "https://www.douyin.com/search/太平鸟"}, {"name": "MLBK", "category": "时尚", "style": "运动时尚、街头潮流", "xhs": "https://www.xiaohongshu.com/search_result?keyword=MLBK", "douyin": "https://www.douyin.com/search/MLBK"}, {"name": "蔻驰", "category": "包具", "style": "轻奢包袋、美式经典", "xhs": "https://www.xiaohongshu.com/search_result?keyword=蔻驰", "douyin": "https://www.douyin.com/search/蔻驰"}, {"name": "小CK", "category": "包具", "style": "快时尚包袋、平价精致", "xhs": "https://www.xiaohongshu.com/search_result?keyword=小CK", "douyin": "https://www.douyin.com/search/小CK"}, {"name": "古良吉吉", "category": "包具", "style": "原创设计、复古文艺", "xhs": "https://www.xiaohongshu.com/search_result?keyword=古良吉吉", "douyin": "https://www.douyin.com/search/古良吉吉"}, {"name": "崧SONG", "category": "包具", "style": "原创包袋、东方极简", "xhs": "https://www.xiaohongshu.com/search_result?keyword=崧SONG", "douyin": "https://www.douyin.com/search/崧SONG"}, {"name": "Songmont山下有松", "category": "包具", "style": "原创设计师包袋、东方极简美学", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Songmont山下有松", "douyin": "https://www.douyin.com/search/Songmont山下有松"}, {"name": "雅诗兰黛", "category": "护肤", "style": "高端护肤、科技抗老", "xhs": "https://www.xiaohongshu.com/search_result?keyword=雅诗兰黛", "douyin": "https://www.douyin.com/user/MS4wLjABAAAA8vUtKe2o8p5acbn6adU0rNbhBn5a-P-t4DXCx6PrP7c"}, {"name": "珀莱雅", "category": "护肤", "style": "功效护肤、早C晚A", "xhs": "https://www.xiaohongshu.com/search_result?keyword=珀莱雅", "douyin": "https://www.douyin.com/search/珀莱雅"}, {"name": "薇诺娜", "category": "护肤", "style": "敏感肌护肤、医学背景", "xhs": "https://www.xiaohongshu.com/search_result?keyword=薇诺娜", "douyin": "https://www.douyin.com/search/薇诺娜"}, {"name": "瑷尔博士", "category": "护肤", "style": "微生态护肤、科学修护", "xhs": "https://www.xiaohongshu.com/search_result?keyword=瑷尔博士", "douyin": "https://www.douyin.com/search/瑷尔博士"}, {"name": "可复美", "category": "护肤", "style": "医美护肤、胶原蛋白", "xhs": "https://www.xiaohongshu.com/search_result?keyword=可复美", "douyin": "https://www.douyin.com/search/可复美"}, {"name": "兰蔻", "category": "护肤", "style": "法式奢护、科技抗老", "xhs": "https://www.xiaohongshu.com/user/profile/5b9a0af31a43810001f90218", "douyin": "https://www.douyin.com/search/兰蔻"}, {"name": "LV", "category": "奢侈品", "style": "顶级奢侈、旅行精神", "xhs": "https://www.xiaohongshu.com/search_result?keyword=LV", "douyin": "https://www.douyin.com/search/LV"}, {"name": "香奈儿", "category": "奢侈品", "style": "顶级奢侈、法式优雅", "xhs": "https://www.xiaohongshu.com/search_result?keyword=香奈儿", "douyin": "https://www.douyin.com/search/香奈儿"}, {"name": "迪奥", "category": "奢侈品", "style": "顶级奢侈、华丽浪漫", "xhs": "https://www.xiaohongshu.com/search_result?keyword=迪奥", "douyin": "https://www.douyin.com/search/迪奥"}, {"name": "古驰", "category": "奢侈品", "style": "顶级奢侈、复古华丽", "xhs": "https://www.xiaohongshu.com/search_result?keyword=古驰", "douyin": "https://www.douyin.com/search/古驰"}, {"name": "Tiffany & Co.", "category": "奢侈品", "style": "经典珠宝、蒂芙尼蓝", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Tiffany & Co.", "douyin": "https://www.douyin.com/search/Tiffany & Co."}, {"name": "喜茶", "category": "茶饮", "style": "新式茶饮、灵感之茶", "xhs": "https://www.xiaohongshu.com/user/profile/5b2b42474eacab7d870eff8f", "douyin": "https://www.douyin.com/user/MS4wLjABAAAAzzgopACopVAaE5hDjJYz33Vh2rbPe2JRx65WmV30eDU2gl-x3inNpL0V20hWC_k3"}, {"name": "霸王茶姬", "category": "茶饮", "style": "国风茶饮、原叶鲜奶茶", "xhs": "https://www.xiaohongshu.com/search_result?keyword=霸王茶姬", "douyin": "https://www.douyin.com/search/霸王茶姬"}, {"name": "茉莉奶白", "category": "茶饮", "style": "花香茶饮、茉莉鲜奶", "xhs": "https://www.xiaohongshu.com/search_result?keyword=茉莉奶白", "douyin": "https://www.douyin.com/search/茉莉奶白"}, {"name": "观夏", "category": "香水", "style": "东方植物香、东方美学", "xhs": "https://www.xiaohongshu.com/user/profile/56139e188a75e150292cd217", "douyin": "https://www.douyin.com/search/观夏"}, {"name": "闻献", "category": "香水", "style": "国产高端香氛、禅酷美学", "xhs": "https://www.xiaohongshu.com/search_result?keyword=闻献", "douyin": "https://www.douyin.com/search/闻献"}, {"name": "大人糖", "category": "个护", "style": "女性愉悦、新消费品", "xhs": "https://www.xiaohongshu.com/search_result?keyword=大人糖", "douyin": "https://www.douyin.com/search/大人糖"}, {"name": "雏菊的天空", "category": "护肤", "style": "植物芳疗护肤、自然纯净", "xhs": "https://www.xiaohongshu.com/search_result?keyword=雏菊的天空", "douyin": "https://www.douyin.com/search/雏菊的天空"}, {"name": "欧舒丹", "category": "护肤", "style": "法式植萃身体护理、普罗旺斯", "xhs": "https://www.xiaohongshu.com/search_result?keyword=欧舒丹", "douyin": "https://www.douyin.com/search/欧舒丹"}, {"name": "野兽派", "category": "生活方式", "style": "高端艺术花礼、生活美学", "xhs": "https://www.xiaohongshu.com/user/profile/59cb357a82ec397699f7cb03", "douyin": "https://www.douyin.com/user/MS4wLjABAAAA5olhbrtNAR_6Ws9PanazwrvuFrBss2e6E4tVpd3XoqU"}, {"name": "Bollycon", "category": "美瞳", "style": "日系自然混血美瞳、舒适水润", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Bollycon", "douyin": "https://www.douyin.com/search/Bollycon"}, {"name": "moody", "category": "美瞳", "style": "国货美瞳头部、潮流花色", "xhs": "https://www.xiaohongshu.com/search_result?keyword=moody", "douyin": "https://www.douyin.com/search/moody"}, {"name": "CoFancy可糖", "category": "美瞳", "style": "新锐彩瞳品牌、高颜值花色", "xhs": "https://www.xiaohongshu.com/search_result?keyword=CoFancy可糖", "douyin": "https://www.douyin.com/search/CoFancy可糖"}, {"name": "可啦啦Kilala", "category": "美瞳", "style": "线上销量领先、日抛专家", "xhs": "https://www.xiaohongshu.com/search_result?keyword=可啦啦Kilala", "douyin": "https://www.douyin.com/search/可啦啦Kilala"}, {"name": "Le Labo", "category": "香水", "style": "纽约小众手工香水、侘寂美学", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Le Labo", "douyin": "https://www.douyin.com/search/Le Labo"}, {"name": "BYREDO", "category": "香水", "style": "瑞典极简沙龙香、北欧美学", "xhs": "https://www.xiaohongshu.com/search_result?keyword=BYREDO", "douyin": "https://www.douyin.com/search/BYREDO"}, {"name": "Diptyque", "category": "香水", "style": "法式艺术香氛、香薰蜡烛", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Diptyque", "douyin": "https://www.douyin.com/search/Diptyque"}, {"name": "Jo Malone", "category": "香水", "style": "英伦香氛、叠香艺术", "xhs": "https://www.xiaohongshu.com/search_result?keyword=Jo Malone", "douyin": "https://www.douyin.com/search/Jo Malone"}, {"name": "馥郁满铺", "category": "香水", "style": "中式文人香氛、东方叙事", "xhs": "https://www.xiaohongshu.com/search_result?keyword=馥郁满铺", "douyin": "https://www.douyin.com/search/馥郁满铺"}, {"name": "伊索 Aesop", "category": "护肤", "style": "澳洲植物护肤、极简哲思", "xhs": "https://www.xiaohongshu.com/search_result?keyword=伊索 Aesop", "douyin": "https://www.douyin.com/search/伊索 Aesop"}];
+const COLORS = ['#c8a47e','#7a8b6f','#a8806b','#8a7e6e','#6b7a8b','#a89580','#9b8b6e','#b89a7a','#7c8a76','#a49080','#8a7c70','#b09a82','#978670','#a88770','#8e7d68','#c39a7b','#7d8b80','#a98a72'];
+let activeCat = '全部';
+
+function uniq(f) { return [...new Set(BRANDS.map(b => b[f]))]; }
+function colorFor(name) { let h=0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return COLORS[h%COLORS.length]; }
+
+function renderTags() {
+  const el = document.getElementById('tags');
+  const cats = ['全部', ...uniq('category')];
+  el.innerHTML = cats.map(c => `<div class="tag ${activeCat===c?'active':''}" data-c="${c}">${c}</div>`).join('');
+  el.querySelectorAll('.tag').forEach(t => t.addEventListener('click', () => { activeCat = t.dataset.c; renderTags(); renderResults(); }));
+}
+
+function renderResults() {
+  const kw = document.getElementById('search').value.toLowerCase();
+  const list = BRANDS.filter(b => {
+    if (activeCat !== '全部' && b.category !== activeCat) return false;
+    if (kw && !b.name.toLowerCase().includes(kw) && !b.style.toLowerCase().includes(kw)) return false;
+    return true;
+  });
+  document.getElementById('count').textContent = `${list.length} RESULTS`;
+  document.getElementById('results').innerHTML = list.map(b => `
+    <div class="card" onclick="openModal('${b.name}')">
+      <div class="cover" style="background:${colorFor(b.name)}">${b.name}</div>
+      <div class="card-body">
+        <div class="card-name">${b.name}</div>
+        <div class="card-desc">${b.style}</div>
+        <div class="card-tags"><span class="card-tag">${b.category}</span></div>
+      </div>
+    </div>
+  `).join('') || '<div style="color:#999;grid-column:1/-1;text-align:center;padding:60px">没有匹配的品牌</div>';
+}
+
+function openModal(name) {
+  const b = BRANDS.find(x => x.name === name);
+  if (!b) return;
+  const c = colorFor(b.name);
+  document.getElementById('m-img').style.background = c;
+  document.getElementById('m-img').textContent = b.name;
+  document.getElementById('m-name').textContent = b.name;
+  document.getElementById('m-cat').textContent = b.category;
+  document.getElementById('m-cat2').textContent = b.category;
+  document.getElementById('m-style').textContent = b.style;
+  document.getElementById('m-desc').textContent = b.style;
+  document.getElementById('m-xhs').href = b.xhs;
+  document.getElementById('m-dy').href = b.douyin;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('search').addEventListener('input', renderResults);
+renderTags(); renderResults();
+</script>
+</body>
+</html>
